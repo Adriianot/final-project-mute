@@ -31,8 +31,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   };
 
   const handleForgotPassword = () => {
-    // Implementar navegación a recuperación de contraseña si existe
-    // navigation.navigate("ForgotPassword");
+    navigation.navigate("ForgotPassword");
   };
 
   const handleSocialLogin = (provider: 'facebook' | 'google') => {
