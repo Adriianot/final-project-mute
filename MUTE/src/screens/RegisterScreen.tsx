@@ -7,18 +7,61 @@ import {
   StyleSheet,
   SafeAreaView,
   Image,
+  Alert,
 } from 'react-native';
+import axios from 'axios';
 
 const RegisterScreen: React.FC = () => {
+  const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
-  const handleRegister = () => {
-    if (password === confirmPassword) {
-      console.log('Registro exitoso:', email);
-    } else {
-      console.log('Las contraseñas no coinciden');
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleRegister = async () => {
+    if (!nombre.trim()) {
+      Alert.alert('Error', 'El nombre completo es obligatorio.');
+      return;
+    }
+
+    if (!validateEmail(email)) {
+      Alert.alert('Error', 'Por favor, ingresa un email válido.');
+      return;
+    }
+
+    if (password.length < 8) {
+      Alert.alert(
+        'Error',
+        'La contraseña debe tener al menos 8 caracteres.'
+      );
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Las contraseñas no coinciden.');
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://192.168.100.128:8000/auth/register', {
+        nombre,
+        email,
+        password,
+
+      });
+
+      Alert.alert('Registro exitoso', 'Tu cuenta ha sido creada con éxito.');
+      console.log('Token recibido:', response.data.token);
+    } catch (error: any) {
+      console.error('Error al registrar:', error.response?.data?.detail || error.message);
+      Alert.alert(
+        'Error',
+        error.response?.data?.detail || 'Hubo un problema con el registro.'
+      );
     }
   };
 
@@ -30,8 +73,15 @@ const RegisterScreen: React.FC = () => {
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <Text style={styles.title}>Crear Cuenta</Text>
-
         <View style={styles.form}>
+        <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Nombre completo"
+              value={nombre}
+              onChangeText={setNombre}
+            />
+          </View>
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
