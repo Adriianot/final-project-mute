@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
-  Alert,
+  Alert, //  
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../navigation/AppNavigator';
@@ -24,6 +24,8 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
   const handleSendResetLink = async () => {
     setLoading(true);
     try {
+      //  conectarlo al backend.
+      /*
       const response = await fetch('http://<TU_BACKEND>/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -36,10 +38,16 @@ const ForgotPasswordScreen: React.FC<ForgotPasswordScreenProps> = ({
       }
 
       Alert.alert('Éxito', 'Enlace de restablecimiento enviado, revisa tu correo');
+      */
+      
+      // Navegamos a la pantalla de inicio de sesión directamente
       navigation.navigate('Login');
     } catch (error) {
-        const errorMessage = (error as Error).message || 'Ocurrió un error';
-        Alert.alert('Error', errorMessage);
+      //  manejo de errores, ya que no hay conexión al backend.
+      /*
+      const errorMessage = (error as Error).message || 'Ocurrió un error';
+      Alert.alert('Error', errorMessage);
+      */
     } finally {
       setLoading(false);
     }
