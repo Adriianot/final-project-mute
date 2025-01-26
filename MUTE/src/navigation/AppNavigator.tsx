@@ -4,12 +4,14 @@ import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
+import MenuScreen from '../screens/MenuScreen';
 
 export type RootStackParamList = {
   Login: undefined;
   Home: undefined;
   Register: undefined;
   ForgotPassword: undefined;
+  Menu: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -21,6 +23,7 @@ const AppNavigator: React.FC = () => {
       <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'Registro' }} />
       <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Inicio' }} />
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} options ={{title: '¿Olvidó su contraseña?'}} />
+      <Stack.Screen name="Menu" component={MenuScreen} options={{ title: 'Menú' }} /> 
     </Stack.Navigator>
   );
 };

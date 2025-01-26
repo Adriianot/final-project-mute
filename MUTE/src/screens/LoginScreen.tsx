@@ -7,6 +7,8 @@ import {
   StyleSheet,
   SafeAreaView,
   Image,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
@@ -19,11 +21,20 @@ type LoginScreenProps = {
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { signIn } = useAuth();
 
-  const handleSignIn = () => {
-    signIn(email, password);
-    navigation.navigate("Home");
+  const handleSignIn =  async() => {
+    setIsSubmitting(true);
+    try {
+      await signIn(email, password);
+      navigation.navigate("Home");
+    } catch (error: any) {
+      Alert.alert("Error de inicio de sesión", error.message);
+    } finally {
+      setIsSubmitting(false);
+    }
+
   };
 
   const handleNavigateToRegister = () => {
@@ -35,7 +46,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   };
 
   const handleSocialLogin = (provider: 'facebook' | 'google') => {
-    // Implementar login social si es necesario
+    
     console.log('Social login with:', provider);
   };
 
@@ -75,8 +86,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             />
           </View>
 
-          <TouchableOpacity style={styles.loginButton} onPress={handleSignIn}>
-            <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
+          <TouchableOpacity style={styles.loginButton} onPress={handleSignIn} disabled={isSubmitting}>
+            {isSubmitting ? (
+              <ActivityIndicator color="#000" />
+            ) : (
+              <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
+            )}
           </TouchableOpacity>
 
           <TouchableOpacity

@@ -22,6 +22,7 @@ type RootStackParamList = {
   Register: undefined;
   ProductDetail: { productId: string };
   Cart: undefined;
+  Menu: undefined;
 };
 
 type HomeScreenProps = {
@@ -48,6 +49,7 @@ const BANNER_ITEMS: BannerItem[] = [
   { id: '1', image: require('../../assets/placeholder.jpg') },
   { id: '2', image: require('../../assets/placeholder.jpg') },
   { id: '3', image: require('../../assets/placeholder.jpg') },
+  { id: '4', image: require('../../assets/placeholder.jpg') },
 ];
 
 const FEATURED_PRODUCTS: Product[] = [
@@ -128,8 +130,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   }, [navigation]);
 
   const handleMenuPress = useCallback(() => {
-    console.log('Menu pressed');
-  }, []);
+    navigation.navigate('Menu');
+  }, [navigation]);
 
   const handleSearchPress = useCallback(() => {
     console.log('Search pressed');

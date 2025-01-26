@@ -1,8 +1,12 @@
-import React, { createContext, useState, ReactNode } from 'react';
+import React, { createContext, useState, ReactNode, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 interface AuthContextProps {
-  signIn: (email: string, password: string) => void;
+  signIn: (email: string, password: string) => Promise<void>;
   signUp: () => void;
+  signOut: () => Promise<void>;
+  isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
@@ -12,16 +16,60 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const signIn = (email: string, password: string) => {
-    console.log('Signing in:', email);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Verificar si existe un token al cargar la aplicación
+  useEffect(() => {
+    const checkToken = async () => {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        setIsAuthenticated(!!token);
+      } catch (error) {
+        console.error('Error verificando el token:', error);
+      }
+    };
+    checkToken();
+  }, []);
+
+  // Función para iniciar sesión
+  const signIn = async (email: string, password: string) => {
+    try {
+      const response = await axios.post('http://192.168.100.128:8000/auth/login', {
+        email,
+        password,
+      });
+
+      const token = response.data.token;
+
+      // Almacenar el token en AsyncStorage
+      await AsyncStorage.setItem('token', token);
+
+      setIsAuthenticated(true);
+      console.log('Login exitoso');
+    } catch (error: any) {
+      console.error('Error al iniciar sesión:', error.response?.data?.detail || error.message);
+      throw new Error(error.response?.data?.detail || 'Error al iniciar sesión');
+    }
   };
 
+  // Función para redirigir al registro (no implementada)
   const signUp = () => {
     console.log('Redirect to sign-up page');
   };
 
+  // Función para cerrar sesión
+  const signOut = async () => {
+    try {
+      await AsyncStorage.removeItem('token');
+      setIsAuthenticated(false);
+      console.log('Cierre de sesión exitoso');
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ signIn, signUp }}>
+    <AuthContext.Provider value={{ signIn, signUp, signOut, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );
