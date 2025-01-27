@@ -77,10 +77,10 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           <Icon name="view-list" size={24} color="#000" />
           <Text style={styles.menuText}>Catálogo</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem} onPress={() => console.log('Carrito')}>
-          <Icon name="shopping-cart" size={24} color="#000" />
-          <Text style={styles.menuText}>Carrito de compras</Text>
-        </TouchableOpacity>
+        <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('CartScreen')}>
+  <Icon name="shopping-cart" size={24} color="#000" />
+  <Text style={styles.menuText}>Carrito de compras</Text>
+</TouchableOpacity>
         <View style={styles.menuItem}>
           <Icon name="brightness-6" size={24} color="#000" />
           <Text style={styles.menuText}>Modo Oscuro</Text>
