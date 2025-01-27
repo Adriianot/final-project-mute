@@ -19,10 +19,19 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.development.muteapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "1337a0ba-9ba8-43b0-8c6f-8d439db5bea9"
+        
+      },
+      "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_ZGlzY3JldGUtd2Fob28tMzguY2xlcmsuYWNjb3VudHMuZGV2JA"
+    },
+    "scheme": "mute"
   }
 }

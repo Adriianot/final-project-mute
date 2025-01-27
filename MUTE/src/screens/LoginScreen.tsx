@@ -13,6 +13,8 @@ import {
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { useAuth } from "../contexts/AuthContext";
+import { useClerkAuth } from "../contexts/ClerkContext";
+import { GoogleLogin } from "../components/GoogleLogin";
 
 type LoginScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, "Login">;
@@ -23,6 +25,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { signIn } = useAuth();
+  const { signInWithGoogle } = useClerkAuth();
 
   const handleSignIn =  async() => {
     setIsSubmitting(true);
@@ -50,6 +53,16 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     console.log('Social login with:', provider);
   };
 
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInWithGoogle();
+      Alert.alert("Éxito", "Inicio de sesión con Google exitoso");
+      navigation.navigate('Home')
+    } catch (error: any) {
+      Alert.alert("Error", error.message);
+    }
+  };
+  
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
@@ -123,7 +136,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.socialButton}
-                onPress={() => handleSocialLogin('google')}
+                onPress={handleGoogleSignIn}
               >
                 <Image
                   source={require('../../assets/google-icon.png')} // Asegúrate de tener este asset

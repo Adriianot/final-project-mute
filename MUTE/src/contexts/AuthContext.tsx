@@ -16,6 +16,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   // Verificar si existe un token al cargar la aplicación
