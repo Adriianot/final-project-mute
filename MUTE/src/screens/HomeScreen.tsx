@@ -126,7 +126,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   );
 
   const handleCartPress = useCallback(() => {
-    navigation.navigate('CartScreen');
+    navigation.navigate('Cart');
   }, [navigation]);
 
   const handleMenuPress = useCallback(() => {
