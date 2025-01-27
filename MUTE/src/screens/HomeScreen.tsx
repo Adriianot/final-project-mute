@@ -15,13 +15,14 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ViewPager from 'react-native-pager-view';
 
+
 // Types
 type RootStackParamList = {
   Home: undefined;
   Login: undefined;
   Register: undefined;
   ProductDetail: { productId: string };
-  Cart: undefined;
+  CartScreen: undefined;
   Menu: undefined;
 };
 
@@ -126,7 +127,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   );
 
   const handleCartPress = useCallback(() => {
-    navigation.navigate('Cart');
+    navigation.navigate('CartScreen');
   }, [navigation]);
 
   const handleMenuPress = useCallback(() => {

@@ -7,9 +7,13 @@ import {
   FlatList,
   TouchableOpacity,
   Modal,
+  TextInput,
+  ActivityIndicator,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-const CartScreen = () => {
+const CartScreen: React.FC = () => {
+  const navigation = useNavigation<any>();
   const [cartItems, setCartItems] = useState([
     {
       id: '1',
@@ -41,30 +45,31 @@ const CartScreen = () => {
     },
   ]);
 
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isSkeletonVisible, setIsSkeletonVisible] = useState(false);
+  const [isBillingFormVisible, setIsBillingFormVisible] = useState(false);
+  const [isReceiptVisible, setIsReceiptVisible] = useState(false);
+  const [isLoadingInBilling, setIsLoadingInBilling] = useState(false);
 
-  // Función para actualizar la cantidad de un producto
-  const updateQuantity = (id: string, type: 'increase' | 'decrease') => {
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id
-          ? {
-              ...item,
-              quantity:
-                type === 'increase'
-                  ? item.quantity + 1
-                  : item.quantity > 1
-                  ? item.quantity - 1
-                  : 1,
-            }
-          : item
-      )
-    );
-  };
-
-  // Calcula el total del carrito en base a las cantidades
   const calculateTotal = () =>
     cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+
+  const handleConfirmPayment = () => {
+    setIsSkeletonVisible(true);
+
+    setTimeout(() => {
+      setIsSkeletonVisible(false);
+      setIsBillingFormVisible(true); // Pasar a la factura después del skeleton
+    }, 3000);
+  };
+
+  const handleBillingFormSubmit = () => {
+    setIsLoadingInBilling(true); // Muestra el cargando en la misma pantalla de factura
+
+    setTimeout(() => {
+      setIsLoadingInBilling(false); // Oculta el cargando
+      setIsReceiptVisible(true); // Muestra la ventana de "Pagado con éxito"
+    }, 3000);
+  };
 
   const renderCartItem = ({ item }: { item: { id: string; name: string; price: number; quantity: number; image: any } }) => (
     <View style={styles.cartItem}>
@@ -72,15 +77,6 @@ const CartScreen = () => {
       <View style={styles.cartDetails}>
         <Text style={styles.itemName}>{item.name}</Text>
         <Text style={styles.itemPrice}>${item.price.toFixed(2)}</Text>
-      </View>
-      <View style={styles.cartQuantity}>
-        <TouchableOpacity onPress={() => updateQuantity(item.id, 'decrease')} style={styles.quantityButtonContainer}>
-          <Text style={styles.quantityButton}>-</Text>
-        </TouchableOpacity>
-        <Text style={styles.quantityText}>{item.quantity}</Text>
-        <TouchableOpacity onPress={() => updateQuantity(item.id, 'increase')} style={styles.quantityButtonContainer}>
-          <Text style={styles.quantityButton}>+</Text>
-        </TouchableOpacity>
       </View>
     </View>
   );
@@ -100,40 +96,88 @@ const CartScreen = () => {
         </View>
         <TouchableOpacity
           style={styles.confirmButton}
-          onPress={() => setIsModalVisible(true)}
+          onPress={handleConfirmPayment}
         >
-          <Text style={styles.confirmButtonText}>CONFIRMAR</Text>
+          <Text style={styles.confirmButtonText}>CONFIRMAR PAGO</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Modal */}
-      <Modal
-        visible={isModalVisible}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setIsModalVisible(false)}
-      >
+      {/* Skeleton Modal */}
+      <Modal visible={isSkeletonVisible} transparent={true} animationType="fade">
         <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Confirmación de Compra</Text>
-            <Text style={styles.modalText}>Tu total es:</Text>
-            <Text style={styles.modalTotal}>${calculateTotal().toFixed(2)}</Text>
-            <TouchableOpacity
-              style={styles.modalConfirmButton}
-              onPress={() => {
-                setIsModalVisible(false);
-                console.log('Compra confirmada');
-              }}
-            >
-              <Text style={styles.modalConfirmText}>Confirmar Pago</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.modalCancelButton}
-              onPress={() => setIsModalVisible(false)}
-            >
-              <Text style={styles.modalCancelText}>Cancelar</Text>
-            </TouchableOpacity>
-          </View>
+          <View style={styles.skeletonBackground} />
+          <Image
+            source={require('../../assets/mute2-logo.png')} // Nuevo logo de MUTE
+            style={styles.extraLargeSkeletonLogo}
+            resizeMode="contain"
+          />
+          <ActivityIndicator size="large" color="#0070BA" />
+          <Text style={styles.loadingText}>Procesando...</Text>
+        </View>
+      </Modal>
+
+      {/* Ventana de Factura */}
+      <Modal visible={isBillingFormVisible} animationType="slide">
+        <View style={styles.fullScreenModal}>
+          <TouchableOpacity
+            onPress={() => setIsBillingFormVisible(false)}
+            style={styles.backButton}
+          >
+            <Text style={styles.backButtonText}>Regresar</Text>
+          </TouchableOpacity>
+          <Image
+            source={require('../../assets/mute-logo.png')}
+            style={styles.muteLogo}
+            resizeMode="contain"
+          />
+          <Text style={styles.billingTitle}>FACTURA</Text>
+          {isLoadingInBilling ? (
+            <View style={styles.billingLoadingContainer}>
+              <ActivityIndicator size="large" color="#0070BA" />
+              <Text style={styles.loadingText}>Procesando...</Text>
+            </View>
+          ) : (
+            <>
+              <TextInput placeholder="Nombre completo" style={styles.input} />
+              <TextInput placeholder="Dirección" style={styles.input} />
+              <TextInput placeholder="Teléfono" style={styles.input} />
+              <TextInput placeholder="Correo electrónico" style={styles.input} />
+              <TouchableOpacity
+                style={styles.billingButton}
+                onPress={handleBillingFormSubmit}
+              >
+                <Text style={styles.billingButtonText}>Guardar</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+      </Modal>
+
+      {/* Ventana de Pagado */}
+      <Modal visible={isReceiptVisible} animationType="slide">
+        <View style={styles.fullScreenModal}>
+          <TouchableOpacity
+            onPress={() => {
+              setIsReceiptVisible(false);
+              setIsBillingFormVisible(true); // Regresa a la factura
+            }}
+            style={styles.backButton}
+          >
+            <Text style={styles.backButtonText}>Regresar</Text>
+          </TouchableOpacity>
+          <Text style={styles.paidText}>PAGADO CON ÉXITO</Text>
+          <Image
+            source={require('../../assets/paypal-logo.png')}
+            style={styles.largePayPalIcon}
+            resizeMode="contain"
+          />
+          <Text style={styles.totalAmount}>Total: ${calculateTotal().toFixed(2)}</Text>
+          <TouchableOpacity
+            style={styles.smallCloseButton}
+            onPress={() => navigation.navigate('Home')} // Regresa a la pantalla de inicio
+          >
+            <Text style={styles.smallCloseButtonText}>CERRAR</Text>
+          </TouchableOpacity>
         </View>
       </Modal>
     </View>
@@ -143,37 +187,11 @@ const CartScreen = () => {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#fff' },
   cartList: { padding: 16 },
-  cartItem: {
-    flexDirection: 'row',
-    marginBottom: 24,
-    alignItems: 'center',
-  },
-  cartImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
-    marginRight: 16,
-  },
+  cartItem: { flexDirection: 'row', marginBottom: 16, alignItems: 'center' },
+  cartImage: { width: 80, height: 80, borderRadius: 8, marginRight: 16 },
   cartDetails: { flex: 1 },
-  itemName: { fontSize: 14, color: '#000', lineHeight: 14 },
-  itemPrice: { fontSize: 14, color: '#777', marginTop: 4, lineHeight: 18 },
-  cartQuantity: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: 110,
-    justifyContent: 'space-between',
-  },
-  quantityButtonContainer: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    backgroundColor: '#f0f0f0',
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 2,
-  },
-  quantityButton: { fontSize: 18, fontWeight: 'bold', color: '#000' },
-  quantityText: { fontSize: 16, color: '#000' },
+  itemName: { fontSize: 16, color: '#000' },
+  itemPrice: { fontSize: 14, color: '#777', marginTop: 4 },
   footer: {
     padding: 16,
     borderTopWidth: 1,
@@ -183,48 +201,59 @@ const styles = StyleSheet.create({
   totalContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 30,
+    marginBottom: 16,
   },
-  totalLabel: { fontSize: 20, color: '#000' },
-  totalAmount: { fontSize: 19, fontWeight: 'bold', color: '#0070BA' },
+  totalLabel: { fontSize: 18, color: '#000' },
+  totalAmount: { fontSize: 20, fontWeight: 'bold', color: '#000', marginTop: 10 },
   confirmButton: {
     backgroundColor: '#000',
-    paddingVertical: 18,
+    paddingVertical: 16,
     borderRadius: 8,
     alignItems: 'center',
   },
   confirmButtonText: { fontSize: 16, color: '#fff', fontWeight: 'bold' },
   modalContainer: {
-    flex: 2,
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-  modalContent: {
-    width: '80%',
+  skeletonBackground: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(255, 255, 255, 0.7)', // Fondo translúcido
+  },
+  extraLargeSkeletonLogo: { width: 300, height: 300, marginBottom: 20 },
+  loadingText: { fontSize: 18, color: '#000', marginTop: 8 },
+  fullScreenModal: {
+    flex: 1,
     backgroundColor: '#fff',
-    borderRadius: 10,
     padding: 20,
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 20, color: '#000' },
-  modalText: { fontSize: 16, color: '#000', marginBottom: 8 },
-  modalTotal: { fontSize: 22, fontWeight: 'bold', color: '#0070BA', marginBottom: 16 },
-  modalConfirmButton: {
-    backgroundColor: '#000',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    marginBottom: 10,
-  },
-  modalConfirmText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
-  modalCancelButton: {
-    backgroundColor: '#ccc',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
+  backButton: {
+    position: 'absolute',
+    top: 40,
+    left: 20,
+    backgroundColor: '#f0f0f0',
+    padding: 10,
     borderRadius: 8,
   },
-  modalCancelText: { color: '#000', fontWeight: 'bold', fontSize: 16 },
+  backButtonText: { fontSize: 14, color: '#000' },
+  muteLogo: { width: 150, height: 150, marginBottom: 20 },
+  billingTitle: { fontSize: 30, fontWeight: 'bold', marginBottom: 16 },
+  input: { width: '100%', borderWidth: 1, borderColor: '#ddd', borderRadius: 8, padding: 8, marginBottom: 12 },
+  billingButton: { backgroundColor: '#000', paddingVertical: 14, borderRadius: 8, alignItems: 'center', width: '60%' },
+  billingButtonText: { fontSize: 16, color: '#fff', fontWeight: 'bold' },
+  billingLoadingContainer: { justifyContent: 'center', alignItems: 'center', marginTop: 50 },
+  largePayPalIcon: { width: 220, height: 220, marginVertical: 20 },
+  paidText: { fontSize: 28, fontWeight: 'bold', color: '#000', marginBottom: 20 },
+  smallCloseButton: { backgroundColor: '#000', paddingVertical: 10, paddingHorizontal: 20, borderRadius: 8, marginTop: 20 },
+  smallCloseButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 14 },
 });
 
 export default CartScreen;
