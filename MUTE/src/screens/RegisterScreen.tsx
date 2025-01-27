@@ -34,10 +34,7 @@ const RegisterScreen: React.FC = () => {
     }
 
     if (password.length < 8) {
-      Alert.alert(
-        'Error',
-        'La contraseña debe tener al menos 8 caracteres.'
-      );
+      Alert.alert('Error', 'La contraseña debe tener al menos 8 caracteres.');
       return;
     }
 
@@ -47,21 +44,17 @@ const RegisterScreen: React.FC = () => {
     }
 
     try {
-      const response = await axios.post('http://192.168.100.128:8000/auth/register', {
+      const response = await axios.post('http://192.168.0.109:8000/auth/register', {
         nombre,
         email,
         password,
-
       });
 
       Alert.alert('Registro exitoso', 'Tu cuenta ha sido creada con éxito.');
       console.log('Token recibido:', response.data.token);
     } catch (error: any) {
       console.error('Error al registrar:', error.response?.data?.detail || error.message);
-      Alert.alert(
-        'Error',
-        error.response?.data?.detail || 'Hubo un problema con el registro.'
-      );
+      Alert.alert('Error', error.response?.data?.detail || 'Hubo un problema con el registro.');
     }
   };
 
@@ -71,10 +64,15 @@ const RegisterScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Image
+        source={require('../../assets/mute-logo.png')}
+        style={styles.logo}
+        resizeMode="contain"
+      />
       <View style={styles.content}>
         <Text style={styles.title}>Crear Cuenta</Text>
-        <View style={styles.form}>
-        <View style={styles.inputContainer}>
+        <View style={styles.tableContainer}>
+          <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
               placeholder="Nombre completo"
@@ -92,7 +90,6 @@ const RegisterScreen: React.FC = () => {
               autoCapitalize="none"
             />
           </View>
-
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
@@ -102,7 +99,6 @@ const RegisterScreen: React.FC = () => {
               onChangeText={setPassword}
             />
           </View>
-
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
@@ -112,33 +108,33 @@ const RegisterScreen: React.FC = () => {
               onChangeText={setConfirmPassword}
             />
           </View>
+        </View>
 
-          <TouchableOpacity style={styles.createButton} onPress={handleRegister}>
-            <Text style={styles.createButtonText}>Crear</Text>
-          </TouchableOpacity>
+        <TouchableOpacity style={styles.createButton} onPress={handleRegister}>
+          <Text style={styles.createButtonText}>Crear</Text>
+        </TouchableOpacity>
 
-          <View style={styles.socialContainer}>
-            <Text style={styles.socialText}>O inicia sesión con</Text>
-            <View style={styles.socialButtons}>
-              <TouchableOpacity
-                style={styles.socialButton}
-                onPress={() => handleSocialLogin('facebook')}
-              >
-                <Image
-                  source={require('../../assets/facebook-icon.png')}
-                  style={styles.socialIcon}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.socialButton}
-                onPress={() => handleSocialLogin('google')}
-              >
-                <Image
-                  source={require('../../assets/google-icon.png')}
-                  style={styles.socialIcon}
-                />
-              </TouchableOpacity>
-            </View>
+        <View style={styles.socialContainer}>
+          <Text style={styles.socialText}>O inicia sesión con</Text>
+          <View style={styles.socialButtons}>
+            <TouchableOpacity
+              style={styles.socialButton}
+              onPress={() => handleSocialLogin('facebook')}
+            >
+              <Image
+                source={require('../../assets/facebook-icon.png')}
+                style={styles.socialIcon}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.socialButton}
+              onPress={() => handleSocialLogin('google')}
+            >
+              <Image
+                source={require('../../assets/google-icon.png')}
+                style={styles.socialIcon}
+              />
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -150,6 +146,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+    padding: 20,
+  },
+  logo: {
+    position: 'absolute',
+    top: 5,
+    left: 10,
+    width: 80,
+    height: 80,
+  
+  
   },
   content: {
     flex: 1,
@@ -157,32 +163,38 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
-    fontSize: 28,
-    marginBottom: 40,
+    fontSize: 24,
+    fontWeight: 'bold',
     color: '#333',
-    textAlign: 'left',
-    width: '100%',
+    textAlign: 'center',
+    marginBottom: 20,
   },
-  form: {
-    width: '100%',
+  tableContainer: {
+    backgroundColor: '#f9f9f9',
+    borderRadius: 8,
+    padding: 20,
+    marginBottom: 20,
+    elevation: 2,
   },
   inputContainer: {
     marginBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
   },
   input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    backgroundColor: '#fff',
     height: 40,
-    paddingHorizontal: 0,
+    paddingHorizontal: 10,
     fontSize: 16,
     color: '#333',
   },
   createButton: {
     backgroundColor: '#000',
-    padding: 15,
+    paddingVertical: 10,
     borderRadius: 8,
     alignItems: 'center',
-    marginTop: 30,
+    marginTop: 10,
   },
   createButtonText: {
     color: '#fff',
@@ -190,7 +202,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   socialContainer: {
-    marginTop: 40,
+    marginTop: 20,
     alignItems: 'center',
   },
   socialText: {
