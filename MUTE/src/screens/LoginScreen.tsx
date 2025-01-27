@@ -130,7 +130,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                 onPress={() => handleSocialLogin('facebook')}
               >
                 <Image
-                  source={require('../../assets/facebook-icon.png')} // Asegúrate de tener este asset
+                  source={require('../../assets/facebook-icon.png')} 
                   style={styles.socialIcon}
                 />
               </TouchableOpacity>
@@ -139,7 +139,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
                 onPress={handleGoogleSignIn}
               >
                 <Image
-                  source={require('../../assets/google-icon.png')} // Asegúrate de tener este asset
+                  source={require('../../assets/google-icon.png')} 
                   style={styles.socialIcon}
                 />
               </TouchableOpacity>
