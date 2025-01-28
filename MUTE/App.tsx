@@ -19,7 +19,7 @@ const App: React.FC = () => {
     <ClerkProvider publishableKey={publishableKey}>
       <ClerkAuthProvider>
         <AuthProvider>
-          <ThemeProvider> {/* Envuelve toda la aplicación */}
+          <ThemeProvider>
             <NavigationContainer>
               <AppNavigator />
             </NavigationContainer>
