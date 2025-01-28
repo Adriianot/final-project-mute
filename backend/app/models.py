@@ -11,3 +11,13 @@ class ClienteRegistro(BaseModel):
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str
+
+class Producto(BaseModel):
+    nombre: str
+    descripcion: Optional[str] = None
+    precio: float
+    stock: int
+    imagen: str
+    categoria: Optional[str] = None
+    marca: Optional[str] = None
+    genero: Optional[str] = "unisex"  # Opciones: hombre, mujer, unisex
