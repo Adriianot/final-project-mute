@@ -77,7 +77,7 @@ const CartScreen: React.FC = () => {
       <View style={dynamicStyles.footer}>
         <Text style={dynamicStyles.totalText}>TOTAL: ${calculateTotal().toFixed(2)}</Text>
         <TouchableOpacity style={dynamicStyles.confirmButton}>
-          <Text style={dynamicStyles.confirmButtonText}>Checkout</Text>
+          <Text style={dynamicStyles.confirmButtonText}>Confirmar</Text>
         </TouchableOpacity>
       </View>
     </View>
