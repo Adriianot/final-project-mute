@@ -1,14 +1,11 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  Image,
-  StyleSheet,
-  FlatList,
-  TouchableOpacity,
-} from 'react-native';
+import {View,Text,Image,StyleSheet,FlatList,TouchableOpacity,} from 'react-native';
+import { useTheme } from '../contexts/ThemeContext'; 
 
 const CartScreen = () => {
+  const { isDarkMode } = useTheme(); // Accede al estado del tema
+  const dynamicStyles = getDynamicStyles(isDarkMode);
+
   const cartItems = [
     {
       id: '1',
@@ -41,14 +38,14 @@ const CartScreen = () => {
   ];
 
   const renderCartItem = ({ item }: { item: { id: string; name: string; price: number; quantity: number; image: any } }) => (
-    <View style={styles.cartItem}>
-      <Image source={item.image} style={styles.cartImage} />
-      <View style={styles.cartDetails}>
-        <Text style={styles.itemName}>{item.name}</Text>
-        <Text style={styles.itemPrice}>${item.price.toFixed(2)}</Text>
+    <View style={dynamicStyles.cartItem}>
+      <Image source={item.image} style={dynamicStyles.cartImage} />
+      <View style={dynamicStyles.cartDetails}>
+        <Text style={dynamicStyles.itemName}>{item.name}</Text>
+        <Text style={dynamicStyles.itemPrice}>${item.price.toFixed(2)}</Text>
       </View>
-      <View style={styles.cartQuantity}>
-        <Text style={styles.quantityText}>{item.quantity}</Text>
+      <View style={dynamicStyles.cartQuantity}>
+        <Text style={dynamicStyles.quantityText}>{item.quantity}</Text>
       </View>
     </View>
   );
@@ -57,53 +54,70 @@ const CartScreen = () => {
     cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
 
   return (
-    <View style={styles.container}>
+    <View style={dynamicStyles.container}>
       <FlatList
         data={cartItems}
         keyExtractor={(item) => item.id}
         renderItem={renderCartItem}
-        style={styles.cartList}
+        style={dynamicStyles.cartList}
       />
-      <View style={styles.footer}>
-        <Text style={styles.totalText}>Total: ${calculateTotal().toFixed(2)}</Text>
-        <TouchableOpacity style={styles.confirmButton}>
-          <Text style={styles.confirmButtonText}>CONFIRMAR</Text>
+      <View style={dynamicStyles.footer}>
+        <Text style={dynamicStyles.totalText}>Total: ${calculateTotal().toFixed(2)}</Text>
+        <TouchableOpacity style={dynamicStyles.confirmButton}>
+          <Text style={dynamicStyles.confirmButtonText}>CONFIRMAR</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  cartList: { padding: 16 },
-  cartItem: { flexDirection: 'row', marginBottom: 16, alignItems: 'center' },
-  cartImage: { width: 60, height: 60, borderRadius: 8, marginRight: 16 },
-  cartDetails: { flex: 1 },
-  itemName: { fontSize: 16, fontWeight: 'bold', color: '#000' },
-  itemPrice: { fontSize: 14, color: '#777', marginTop: 4 },
-  cartQuantity: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: 60,
-  },
-  quantityText: { fontSize: 16, color: '#000' },
-  footer: {
-    padding: 16,
-    borderTopWidth: 1,
-    borderColor: '#eee',
-    backgroundColor: '#fff',
-  },
-  totalText: { fontSize: 18, fontWeight: 'bold', color: '#000' },
-  confirmButton: {
-    marginTop: 16,
-    backgroundColor: '#000', // Botón negro
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  confirmButtonText: { fontSize: 16, color: '#fff', fontWeight: 'bold' },
-});
+const getDynamicStyles = (isDarkMode: boolean) =>
+  StyleSheet.create({
+    container: { flex: 1, backgroundColor: isDarkMode ? '#121212' : '#ffffff' },
+    cartList: { padding: 16 },
+    cartItem: { flexDirection: 'row', marginBottom: 16, alignItems: 'center' },
+    cartImage: { width: 60, height: 60, borderRadius: 8, marginRight: 16 },
+    cartDetails: { flex: 1 },
+    itemName: {
+      fontSize: 16,
+      fontWeight: 'bold',
+      color: isDarkMode ? '#ffffff' : '#000000',
+    },
+    itemPrice: {
+      fontSize: 14,
+      color: isDarkMode ? '#aaaaaa' : '#777777',
+      marginTop: 4,
+    },
+    cartQuantity: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      width: 60,
+    },
+    quantityText: { fontSize: 16, color: isDarkMode ? '#ffffff' : '#000000' },
+    footer: {
+      padding: 16,
+      borderTopWidth: 1,
+      borderColor: isDarkMode ? '#333333' : '#eeeeee',
+      backgroundColor: isDarkMode ? '#1e1e1e' : '#ffffff',
+    },
+    totalText: {
+      fontSize: 18,
+      fontWeight: 'bold',
+      color: isDarkMode ? '#ffffff' : '#000000',
+    },
+    confirmButton: {
+      marginTop: 16,
+      backgroundColor: isDarkMode ? '#333333' : '#000000',
+      paddingVertical: 12,
+      borderRadius: 8,
+      alignItems: 'center',
+    },
+    confirmButtonText: {
+      fontSize: 16,
+      color: isDarkMode ? '#ffffff' : '#ffffff',
+      fontWeight: 'bold',
+    },
+  });
 
 export default CartScreen;
