@@ -37,7 +37,7 @@ const AppNavigator: React.FC = () => {
       <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Inicio' }} />
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} options={{ title: '¿Olvidó su contraseña?' }} />
       <Stack.Screen name="Menu" component={MenuScreen} options={{ title: 'Menú' }} />
-      <Stack.Screen name="CartScreen" component={CartScreen} options={{ title: 'Su compra' }} />
+      <Stack.Screen name="CartScreen" component={CartScreen} options={{ title: 'Compra' }} />
     </Stack.Navigator>
   );
 };
