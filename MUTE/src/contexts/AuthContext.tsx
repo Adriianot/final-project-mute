@@ -35,7 +35,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Función para iniciar sesión
   const signIn = async (email: string, password: string) => {
     try {
-      const response = await axios.post('http://192.168.100.128:8000/auth/login', {
+      const response = await axios.post('http://192.168.0.109:8000/auth/login', {
         email,
         password,
       });
