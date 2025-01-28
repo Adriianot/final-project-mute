@@ -1,12 +1,17 @@
-import React from 'react';
-import {View,Text,Image,StyleSheet,FlatList,TouchableOpacity,} from 'react-native';
+import React, { useState } from 'react';
+import {View,Text,Image,StyleSheet,FlatList,TouchableOpacity,  Modal,
+  TextInput,
+  ActivityIndicator,
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useTheme } from '../contexts/ThemeContext'; 
 
-const CartScreen = () => {
+const CartScreen: React.FC = () => {
   const { isDarkMode } = useTheme(); // Accede al estado del tema
   const dynamicStyles = getDynamicStyles(isDarkMode);
 
-  const cartItems = [
+  const navigation = useNavigation<any>();
+  const [cartItems, setCartItems] = useState([
     {
       id: '1',
       name: "Nike Air Force 1 Shadow Women's Shoes",
@@ -35,7 +40,33 @@ const CartScreen = () => {
       quantity: 1,
       image: require('../../assets/nike4.jpg'),
     },
-  ];
+  ]);
+
+  const [isSkeletonVisible, setIsSkeletonVisible] = useState(false);
+  const [isBillingFormVisible, setIsBillingFormVisible] = useState(false);
+  const [isReceiptVisible, setIsReceiptVisible] = useState(false);
+  const [isLoadingInBilling, setIsLoadingInBilling] = useState(false);
+
+  const calculateTotal = () =>
+    cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+
+  const handleConfirmPayment = () => {
+    setIsSkeletonVisible(true);
+
+    setTimeout(() => {
+      setIsSkeletonVisible(false);
+      setIsBillingFormVisible(true); // Pasar a la factura después del skeleton
+    }, 3000);
+  };
+
+  const handleBillingFormSubmit = () => {
+    setIsLoadingInBilling(true); // Muestra el cargando en la misma pantalla de factura
+
+    setTimeout(() => {
+      setIsLoadingInBilling(false); // Oculta el cargando
+      setIsReceiptVisible(true); // Muestra la ventana de "Pagado con éxito"
+    }, 3000);
+  };
 
   const renderCartItem = ({ item }: { item: { id: string; name: string; price: number; quantity: number; image: any } }) => (
     <View style={dynamicStyles.cartItem}>
@@ -49,9 +80,6 @@ const CartScreen = () => {
       </View>
     </View>
   );
-
-  const calculateTotal = () =>
-    cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
 
   return (
     <View style={dynamicStyles.container}>
@@ -67,6 +95,10 @@ const CartScreen = () => {
           <Text style={dynamicStyles.confirmButtonText}>CONFIRMAR</Text>
         </TouchableOpacity>
       </View>
+
+
+
+      
     </View>
   );
 };

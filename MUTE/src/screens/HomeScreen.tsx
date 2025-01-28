@@ -16,6 +16,7 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import ViewPager from 'react-native-pager-view';
 import { useTheme } from '../contexts/ThemeContext';
 
+
 // Types
 type RootStackParamList = {
   Home: undefined;
