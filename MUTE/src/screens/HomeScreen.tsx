@@ -48,10 +48,10 @@ interface BannerItem {
 const { width: windowWidth } = Dimensions.get('window');
 
 const BANNER_ITEMS: BannerItem[] = [
-  { id: '1', image: require('../../assets/placeholder.jpg') },
-  { id: '2', image: require('../../assets/placeholder.jpg') },
-  { id: '3', image: require('../../assets/placeholder.jpg') },
-  { id: '4', image: require('../../assets/placeholder.jpg') },
+  { id: '1', image: require('../../assets/banner1.jpg') },
+  { id: '2', image: require('../../assets/banner2.jpg') },
+  { id: '3', image: require('../../assets/banner3.jpg') },
+  { id: '4', image: require('../../assets/banner4.jpg') },
 ];
 
 const FEATURED_PRODUCTS: Product[] = [
