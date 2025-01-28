@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -15,7 +15,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import ViewPager from 'react-native-pager-view';
 import { useTheme } from '../contexts/ThemeContext';
-
 
 // Types
 type RootStackParamList = {
@@ -67,18 +66,6 @@ const FEATURED_PRODUCTS: Product[] = [
     title: 'Nike Sneakers',
     price: '$89.99',
   },
-  // {
-  //   id: '3',
-  //   image: require('../../assets/product3.jpg'),
-  //   title: 'Denim Jeans',
-  //   price: '$69.99',
-  // },
-  // {
-  //   id: '4',
-  //   image: require('../../assets/product4.jpg'),
-  //   title: 'Sport Top',
-  //   price: '$39.99',
-  // },
 ];
 
 // Components
@@ -86,7 +73,7 @@ const Header: React.FC<{
   onMenuPress: () => void;
   onSearchPress: () => void;
   onCartPress: () => void;
-  isDarkMode: boolean; // Prop para cambiar estilos dinámicamente
+  isDarkMode: boolean;
 }> = ({ onMenuPress, onSearchPress, onCartPress, isDarkMode }) => {
   const dynamicStyles = getDynamicStyles(isDarkMode);
 
@@ -128,8 +115,25 @@ const ProductCard: React.FC<Product & { onPress: (productId: string) => void; is
 };
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
-  const { isDarkMode } = useTheme(); // Obtén el estado del tema
+  const { isDarkMode } = useTheme();
   const dynamicStyles = getDynamicStyles(isDarkMode);
+
+  const [currentPage, setCurrentPage] = useState(0);
+  const viewPagerRef = useRef<ViewPager>(null);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentPage((prevPage) => (prevPage + 1) % BANNER_ITEMS.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (viewPagerRef.current) {
+      viewPagerRef.current.setPage(currentPage);
+    }
+  }, [currentPage]);
 
   const handleProductPress = useCallback(
     (productId: string) => {
@@ -152,7 +156,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={dynamicStyles.container}>
-      <StatusBar backgroundColor={isDarkMode ? '#121212' : '#ffffff'} barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
+      <StatusBar
+        backgroundColor={isDarkMode ? '#121212' : '#ffffff'}
+        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+      />
       <Header
         onMenuPress={handleMenuPress}
         onSearchPress={handleSearchPress}
@@ -160,7 +167,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         isDarkMode={isDarkMode}
       />
       <ScrollView showsVerticalScrollIndicator={false} style={dynamicStyles.scrollView}>
-        <ViewPager style={dynamicStyles.viewPager} initialPage={0}>
+        <ViewPager
+          style={dynamicStyles.viewPager}
+          initialPage={0}
+          ref={viewPagerRef}
+          onPageSelected={(e) => setCurrentPage(e.nativeEvent.position)}
+        >
           {BANNER_ITEMS.map((item) => (
             <View key={item.id} style={dynamicStyles.bannerPage}>
               <Image source={item.image} style={dynamicStyles.bannerImage} resizeMode="cover" />
@@ -171,7 +183,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           <Text style={dynamicStyles.sectionTitle}>Productos Destacados</Text>
           <View style={dynamicStyles.productsGrid}>
             {FEATURED_PRODUCTS.map((product) => (
-              <ProductCard key={product.id} {...product} onPress={handleProductPress} isDarkMode={isDarkMode} />
+              <ProductCard
+                key={product.id}
+                {...product}
+                onPress={handleProductPress}
+                isDarkMode={isDarkMode}
+              />
             ))}
           </View>
         </View>
@@ -214,6 +231,5 @@ const getDynamicStyles = (isDarkMode: boolean) =>
     productTitle: { fontSize: 14, marginTop: 8, marginHorizontal: 8, color: isDarkMode ? '#ffffff' : '#000000' },
     productPrice: { fontSize: 16, fontWeight: 'bold', marginHorizontal: 8, color: isDarkMode ? '#ffffff' : '#000000' },
   });
-
 
 export default HomeScreen;
