@@ -56,7 +56,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const handleGoogleSignIn = async () => {
     try {
       await signInWithGoogle();
-      Alert.alert("Éxito", "Google login successful");
+      Alert.alert("Success", "Google login successful");
       navigation.navigate('Home')
     } catch (error: any) {
       Alert.alert("Error", error.message);
@@ -92,7 +92,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
-              placeholder="Contraseña"
+              placeholder="Password"
               secureTextEntry
               value={password}
               onChangeText={setPassword}
@@ -103,7 +103,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             {isSubmitting ? (
               <ActivityIndicator color="#000" />
             ) : (
-              <Text style={styles.loginButtonText}>Iniciar Sesión</Text>
+              <Text style={styles.loginButtonText}>Log In</Text>
             )}
           </TouchableOpacity>
 
