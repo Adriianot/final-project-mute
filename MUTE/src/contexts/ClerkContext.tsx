@@ -27,12 +27,12 @@ export const ClerkAuthProvider: React.FC<ClerkAuthProviderProps> = ({ children }
       if (createdSessionId) {
         await setActive!({ session: createdSessionId });
         await AsyncStorage.setItem('token', createdSessionId);
-        console.log('Inicio de sesión con Google exitoso');
+        console.log('Google login successful');
       } else {
-        console.error('No se pudo obtener la sesión de Clerk');
+        console.error('Failed to get Clerk session');
       }
     } catch (err) {
-      console.error('Error al iniciar sesión con Google:', JSON.stringify(err, null, 2));
+      console.error('Error logging in with Google:', JSON.stringify(err, null, 2));
     }
   };
 

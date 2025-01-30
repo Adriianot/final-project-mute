@@ -66,7 +66,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-        {/* Logo y título */}
+        {/* Logo and tittle */}
         <View style={styles.logoContainer}>
           <Image
             source={require('../../assets/mute-logo.png')} 
@@ -76,7 +76,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           <Text style={styles.title}>MUTE</Text>
         </View>
 
-        {/* Formulario */}
+        {/* Form*/}
         <View style={styles.form}>
           <View style={styles.inputContainer}>
             <TextInput

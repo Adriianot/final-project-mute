@@ -19,20 +19,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Verificar si existe un token al cargar la aplicación
+  // Check if a token exists when loading the application
   useEffect(() => {
     const checkToken = async () => {
       try {
         const token = await AsyncStorage.getItem('token');
         setIsAuthenticated(!!token);
       } catch (error) {
-        console.error('Error verificando el token:', error);
+        console.error('Error verifying token:', error);
       }
     };
     checkToken();
   }, []);
 
-  // Función para iniciar sesión
+  // Login function
   const signIn = async (email: string, password: string) => {
     try {
       const response = await axios.post('http://192.168.0.109:8000/auth/login', {
@@ -42,30 +42,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       const token = response.data.token;
 
-      // Almacenar el token en AsyncStorage
+      // Store the token in AsyncStorage
       await AsyncStorage.setItem('token', token);
 
       setIsAuthenticated(true);
-      console.log('Login exitoso');
+      console.log('Login successful');
     } catch (error: any) {
-      console.error('Error al iniciar sesión:', error.response?.data?.detail || error.message);
-      throw new Error(error.response?.data?.detail || 'Error al iniciar sesión');
+      console.error('Error logging in:', error.response?.data?.detail || error.message);
+      throw new Error(error.response?.data?.detail || 'Error logging in');
     }
   };
 
-  // Función para redirigir al registro (no implementada)
+  // Function to redirect to the registry (not implemented)
   const signUp = () => {
     console.log('Redirect to sign-up page');
   };
 
-  // Función para cerrar sesión
+  // Logout function
   const signOut = async () => {
     try {
       await AsyncStorage.removeItem('token');
       setIsAuthenticated(false);
-      console.log('Cierre de sesión exitoso');
+      console.log('Successful logout');
     } catch (error) {
-      console.error('Error al cerrar sesión:', error);
+      console.error('Error logging out:', error);
     }
   };
 

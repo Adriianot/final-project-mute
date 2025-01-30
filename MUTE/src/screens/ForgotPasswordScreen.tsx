@@ -19,9 +19,9 @@ const ForgotPasswordScreen: React.FC = () => {
   const handleSendResetLink = async () => {
     setLoading(true);
     try {
-      Alert.alert('Éxito', 'Enlace de restablecimiento enviado, revisa tu correo');
+      Alert.alert('Success', 'Reset link sent, check your email');
     } catch (error) {
-      Alert.alert('Error', 'Ocurrió un error al buscar la cuenta.');
+      Alert.alert('Error', 'An error occurred while searching for the account.');
     } finally {
       setLoading(false);
     }
@@ -31,7 +31,7 @@ const ForgotPasswordScreen: React.FC = () => {
     try {
       //navigation.navigate('Login');
     } catch (error) {
-      Alert.alert('Error', 'No se pudo navegar a la pantalla de inicio de sesión.');
+      Alert.alert('Error', 'Could not navigate to the login screen.');
     }
   };
 
@@ -46,14 +46,14 @@ const ForgotPasswordScreen: React.FC = () => {
       </View>
 
       <View style={styles.textContentWrapper}>
-        <Text style={styles.title}>Recuperar tu cuenta</Text>
+        <Text style={styles.title}>Recover your account</Text>
       </View>
 
       <View style={styles.tableContainer}>
-        <Text style={styles.label}>Introduce tu correo electrónico para buscar tu cuenta:</Text>
+        <Text style={styles.label}>Enter your email to search for your account:</Text>
         <TextInput
           style={styles.input}
-          placeholder="Correo electrónico"
+          placeholder="Email"
           placeholderTextColor="#aaa"
           keyboardType="email-address"
           value={email}
@@ -67,14 +67,14 @@ const ForgotPasswordScreen: React.FC = () => {
           style={styles.cancelButton}
           onPress={handleNavigateToLogin}
         >
-          <Text style={styles.cancelButtonText}>Cancelar</Text>
+          <Text style={styles.cancelButtonText}>Cancel</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.resetButton, loading && styles.disabledButton]}
           onPress={handleSendResetLink}
           disabled={loading}
         >
-          <Text style={styles.resetButtonText}>{loading ? 'Buscando...' : 'Buscar'}</Text>
+          <Text style={styles.resetButtonText}>{loading ? 'Searching...' : 'Search'}</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
