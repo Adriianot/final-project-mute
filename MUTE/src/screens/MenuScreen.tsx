@@ -12,32 +12,34 @@ import {
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as ImagePicker from 'expo-image-picker';
 import { useUser } from '@clerk/clerk-expo';
 import axios from 'axios';
-import { useTheme } from '../contexts/ThemeContext'; // Contex of the theme
+import { useTheme } from '../contexts/ThemeContext';
 
 const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { isDarkMode, toggleDarkMode } = useTheme();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
 
-  const { isLoaded, isSignedIn, user: clerkUser } = useUser(); // Hook of Clerk
+  const { isLoaded, isSignedIn, user: clerkUser } = useUser();
 
   const handleNavigation = (screen: string) => {
     navigation.navigate(screen);
   };
 
-  // Function for obtain user data from backend
   const fetchUserFromDatabase = async () => {
     try {
-      const token = await AsyncStorage.getItem('token'); // Bring token from storage
-      if (!token) throw new Error('Token not found in storage'); // If token not found
+      const token = await AsyncStorage.getItem('token');
+      if (!token) throw new Error('Token not found in storage');
 
-      const response = await axios.get('http://192.168.0.109:8000/auth/user', {
-        headers: { Authorization: `Bearer ${token}` }, // Send token in headers
+      const response = await axios.get('http://192.168.100.128:8000/auth/user', {
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      setUser(response.data); // Update user state
+      setUser(response.data);
+      setProfileImage(response.data.profileImage || null);
     } catch (error) {
       console.error('Error getting user data from database:', error);
     } finally {
@@ -45,25 +47,22 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     }
   };
 
-  // Function for obtain user data from Clerk
   const fetchUserFromClerk = () => {
     if (isLoaded && isSignedIn && clerkUser) {
       setUser({
         nombre: clerkUser.firstName || 'User',
         email: clerkUser.emailAddresses[0]?.emailAddress || 'No email',
       });
+      setProfileImage(clerkUser.imageUrl || null);
       setLoading(false);
     }
   };
 
-  // Clerk or BD?
   useEffect(() => {
     const fetchUserData = async () => {
       if (isLoaded && isSignedIn) {
-        // Auth with Clerk
         fetchUserFromClerk();
       } else {
-        // Clerk search in the BD
         await fetchUserFromDatabase();
       }
     };
@@ -71,7 +70,61 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     fetchUserData();
   }, [isLoaded, isSignedIn]);
 
-  // Logout function
+  // Solicitar permisos para cámara y galería
+  const requestPermissions = async () => {
+    const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
+    const { status: galleryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (cameraStatus !== 'granted' || galleryStatus !== 'granted') {
+      Alert.alert('Permisos requeridos', 'Debes permitir el acceso a la cámara y galería.');
+      return false;
+    }
+    return true;
+  };
+
+  const pickImage = async () => {
+  const hasPermissions = await requestPermissions();
+  if (!hasPermissions) return;
+
+  Alert.alert(
+    'Seleccionar imagen',
+    '¿Cómo quieres agregar la imagen?',
+    [
+      {
+        text: 'Cámara',
+        onPress: async () => {
+          const result = await ImagePicker.launchCameraAsync({
+            mediaTypes: ['images'],
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 1,
+          });
+
+          if (!result.canceled) {
+            setProfileImage(result.assets[0].uri);
+          }
+        },
+      },
+      {
+        text: 'Galería',
+        onPress: async () => {
+          const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ['images'],
+            allowsEditing: true,
+            aspect: [1, 1],
+            quality: 1,
+          });
+
+          if (!result.canceled) {
+            setProfileImage(result.assets[0].uri);
+          }
+        },
+      },
+      { text: 'Cancelar', style: 'cancel' },
+    ]
+  );
+};
+
   const handleLogout = async () => {
     Alert.alert(
       'Cerrar Sesión',
@@ -82,8 +135,8 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           text: 'Aceptar',
           onPress: async () => {
             try {
-              await AsyncStorage.removeItem('token'); // Clean Storage Token
-              navigation.navigate('Login'); // Go to Login
+              await AsyncStorage.removeItem('token');
+              navigation.navigate('Login');
             } catch (error) {
               console.error('Error logging out:', error);
             }
@@ -107,10 +160,16 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   return (
     <SafeAreaView style={dynamicStyles.container}>
       <View style={dynamicStyles.profileSection}>
-        <Image
-          source={require('../../assets/profile-placeholder.png')}
-          style={dynamicStyles.profileImage}
-        />
+        <TouchableOpacity onPress={pickImage}>
+          <Image
+            source={
+              profileImage
+                ? { uri: profileImage }
+                : require('../../assets/profile-placeholder.png')
+            }
+            style={dynamicStyles.profileImage}
+          />
+        </TouchableOpacity>
         <Text style={dynamicStyles.profileName}>{user?.nombre || 'User'}</Text>
         <Text style={dynamicStyles.profileSubtitle}>{user?.email || ''}</Text>
       </View>

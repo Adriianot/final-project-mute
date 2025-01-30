@@ -20,7 +20,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.development.muteapp"
+      "package": "com.development.muteapp",
+      "permissions": ["CAMERA", "WRITE_EXTERNAL_STORAGE", "READ_EXTERNAL_STORAGE"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
@@ -33,7 +34,7 @@
     },
     "scheme": "mute",
     "plugins": [
-      "expo-secure-store"
+    "expo-secure-store"
     ]
   }
 }
