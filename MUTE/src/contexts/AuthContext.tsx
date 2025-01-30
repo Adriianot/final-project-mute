@@ -19,7 +19,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Verificar si existe un token al cargar la aplicación
   useEffect(() => {
     const checkToken = async () => {
       try {
@@ -32,10 +31,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     checkToken();
   }, []);
 
-  // Función para iniciar sesión
   const signIn = async (email: string, password: string) => {
     try {
-      const response = await axios.post('http://192.168.0.109:8000/auth/login', {
+      const response = await axios.post('http:// 192.168.100.128:8000/auth/login', {
         email,
         password,
       });
@@ -53,12 +51,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // Función para redirigir al registro (no implementada)
   const signUp = () => {
     console.log('Redirect to sign-up page');
   };
 
-  // Función para cerrar sesión
   const signOut = async () => {
     try {
       await AsyncStorage.removeItem('token');

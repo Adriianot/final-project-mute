@@ -1,6 +1,6 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import { useTheme } from '../contexts/ThemeContext'; // Importa el contexto del tema
+import { useTheme } from '../contexts/ThemeContext'; 
 import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
 import RegisterScreen from '../screens/RegisterScreen';
@@ -20,16 +20,16 @@ export type RootStackParamList = {
 const Stack = createStackNavigator<RootStackParamList>();
 
 const AppNavigator: React.FC = () => {
-  const { isDarkMode } = useTheme(); // Accede al estado del tema
+  const { isDarkMode } = useTheme(); 
 
   return (
     <Stack.Navigator
       initialRouteName="Login"
       screenOptions={{
         headerStyle: {
-          backgroundColor: isDarkMode ? '#121212' : '#ffffff', // Fondo del encabezado
+          backgroundColor: isDarkMode ? '#121212' : '#ffffff', 
         },
-        headerTintColor: isDarkMode ? '#ffffff' : '#000000', // Color del texto
+        headerTintColor: isDarkMode ? '#ffffff' : '#000000', 
       }}
     >
       <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />

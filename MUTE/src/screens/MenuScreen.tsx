@@ -8,14 +8,15 @@ import {
   Switch,
   SafeAreaView,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Para manejar el token
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
-import { useTheme } from '../contexts/ThemeContext'; // Asegúrate de que la ruta sea correcta
+import { useTheme } from '../contexts/ThemeContext'; 
 
 const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
-  const { isDarkMode, toggleDarkMode } = useTheme(); // Usar contexto global para el tema
+  const { isDarkMode, toggleDarkMode } = useTheme();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
@@ -29,7 +30,7 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       const token = await AsyncStorage.getItem('token'); // Recupera el token
       if (!token) throw new Error('Token no encontrado');
 
-      const response = await axios.get('http://192.168.100.128:8000/auth/user', {
+      const response = await axios.get('http:// 192.168.100.128:8000/auth/user', {
         headers: { Authorization: `Bearer ${token}` }, // Envía el token como encabezado
       });
 
@@ -44,6 +45,29 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   useEffect(() => {
     fetchUserData();
   }, []);
+
+  const handleLogout = async () => {
+    Alert.alert(
+      'Cerrar Sesión',
+      '¿Estás seguro de que deseas cerrar sesión?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Aceptar',
+          onPress: async () => {
+            try {
+              await AsyncStorage.clear();
+              // Navega al Home
+              navigation.navigate('Login');
+            } catch (error) {
+              console.error('Error al cerrar sesión:', error);
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
 
   const dynamicStyles = getDynamicStyles(isDarkMode);
 
@@ -91,7 +115,7 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           <Icon name="help-outline" size={24} color={isDarkMode ? '#fff' : '#000'} />
           <Text style={dynamicStyles.menuText}>Ayuda</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={dynamicStyles.menuItem} onPress={() => console.log('Cerrar Sesión')}>
+        <TouchableOpacity style={dynamicStyles.menuItem} onPress={handleLogout}>
           <Icon name="logout" size={24} color={isDarkMode ? '#fff' : '#000'} />
           <Text style={dynamicStyles.menuText}>Cerrar Sesión</Text>
         </TouchableOpacity>

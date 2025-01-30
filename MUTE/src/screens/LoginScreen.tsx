@@ -14,7 +14,7 @@ import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { useAuth } from "../contexts/AuthContext";
 import { useClerkAuth } from "../contexts/ClerkContext";
-import { GoogleLogin } from "../components/GoogleLogin";
+import SkeletonPlaceholder from '../components/SkeletonPlaceholder';
 
 type LoginScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, "Login">;
@@ -39,6 +39,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     }
 
   };
+
+  if (isSubmitting) {
+    return <SkeletonPlaceholder />;
+  }
 
   const handleNavigateToRegister = () => {
     navigation.navigate("Register");
@@ -121,7 +125,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             <Text style={styles.createAccountText}>Crear cuenta nueva</Text>
           </TouchableOpacity>
 
-          {/* Social Login */}
           <View style={styles.socialContainer}>
             <Text style={styles.socialText}>O inicia sesión con</Text>
             <View style={styles.socialButtons}>

@@ -60,13 +60,10 @@ const CartScreen: React.FC = () => {
   return (
     <View style={dynamicStyles.container}>
       <View style={dynamicStyles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Icon name="arrow-back" size={24} color={isDarkMode ? '#ffffff' : '#000000'} />
-        </TouchableOpacity>
         <Text style={dynamicStyles.headerTitle}>Shopping Cart</Text>
-        <TouchableOpacity>
+
           <Icon name="shopping-cart" size={24} color={isDarkMode ? '#ffffff' : '#000000'} />
-        </TouchableOpacity>
+
       </View>
       <FlatList
         data={cartItems}

@@ -9,13 +9,13 @@ export const GoogleLogin = () => {
     redirectUri: makeRedirectUri({
       scheme: "mute",
       }),
-    scopes: ["openid", "profile", "email"], // Scopes básicos
+    scopes: ["openid", "profile", "email"],
   });
 
 
   const handleGoogleLogin = async (token: string) => {
     try {
-      const res = await fetch("http://192.168.100.128:8000/auth/google", {
+      const res = await fetch("92.168.43.87:8000/auth/google", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token }),

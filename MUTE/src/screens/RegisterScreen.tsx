@@ -44,7 +44,7 @@ const RegisterScreen: React.FC = () => {
     }
 
     try {
-      const response = await axios.post('http://192.168.0.109:8000/auth/register', {
+      const response = await axios.post('http:// 192.168.100.128:8000/auth/register', {
         nombre,
         email,
         password,
