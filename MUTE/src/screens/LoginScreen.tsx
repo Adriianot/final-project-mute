@@ -33,7 +33,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
       await signIn(email, password);
       navigation.navigate("Home");
     } catch (error: any) {
-      Alert.alert("Error de inicio de sesión", error.message);
+      Alert.alert("Login Error", error.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -56,7 +56,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const handleGoogleSignIn = async () => {
     try {
       await signInWithGoogle();
-      Alert.alert("Éxito", "Inicio de sesión con Google exitoso");
+      Alert.alert("Éxito", "Google login successful");
       navigation.navigate('Home')
     } catch (error: any) {
       Alert.alert("Error", error.message);
@@ -81,7 +81,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
-              placeholder="Correo electrónico"
+              placeholder="Email"
               keyboardType="email-address"
               value={email}
               onChangeText={setEmail}
@@ -111,19 +111,19 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             style={styles.forgotPassword}
             onPress={handleForgotPassword}
           >
-            <Text style={styles.forgotPasswordText}>¿Olvidó su contraseña?</Text>
+            <Text style={styles.forgotPasswordText}>¿Forgot your password?</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.createAccount}
             onPress={handleNavigateToRegister}
           >
-            <Text style={styles.createAccountText}>Crear cuenta nueva</Text>
+            <Text style={styles.createAccountText}>Create new account</Text>
           </TouchableOpacity>
 
           {/* Social Login */}
           <View style={styles.socialContainer}>
-            <Text style={styles.socialText}>O inicia sesión con</Text>
+            <Text style={styles.socialText}>Or log in with</Text>
             <View style={styles.socialButtons}>
               <TouchableOpacity
                 style={styles.socialButton}

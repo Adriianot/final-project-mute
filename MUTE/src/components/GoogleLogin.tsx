@@ -9,13 +9,13 @@ export const GoogleLogin = () => {
     redirectUri: makeRedirectUri({
       scheme: "mute",
       }),
-    scopes: ["openid", "profile", "email"], // Scopes básicos
+    scopes: ["openid", "profile", "email"], // Info to get from Google
   });
 
 
   const handleGoogleLogin = async (token: string) => {
     try {
-      const res = await fetch("http://192.168.100.128:8000/auth/google", {
+      const res = await fetch("http://192.168.0.109:8000/auth/google", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token }),
@@ -23,13 +23,13 @@ export const GoogleLogin = () => {
 
       const data = await res.json();
       if (res.ok) {
-        Alert.alert("Inicio de sesión exitoso", "Bienvenido " + data.name);
-        // Guardar el JWT para futuras solicitudes
+        Alert.alert("Login successful", "Welcome " + data.name);
+        // Save the JWT for future requests
       } else {
-        Alert.alert("Error", data.detail || "No se pudo completar el inicio de sesión.");
+        Alert.alert("Error", data.detail || "The login could not be completed.");
       }
     } catch (error) {
-      Alert.alert("Error", "Hubo un problema con la autenticación.");
+      Alert.alert("Error", "There was a problem with authentication.");
     }
   };
 
@@ -39,14 +39,14 @@ export const GoogleLogin = () => {
       if (authentication?.accessToken) {
         handleGoogleLogin(authentication.accessToken);
       } else {
-        Alert.alert("Error", "No se pudo obtener el token de Google.");
+        Alert.alert("Error", "Failed to get Google token.");
       }
     }
   }, [response]);
 
   return (
     <Button
-      title="Iniciar sesión con Google"
+      title="Sign in with Google"
       onPress={() => promptAsync()}
       disabled={!request}
     />

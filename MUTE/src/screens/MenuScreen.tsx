@@ -8,42 +8,91 @@ import {
   Switch,
   SafeAreaView,
   ActivityIndicator,
+  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Para manejar el token
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useUser } from '@clerk/clerk-expo';
 import axios from 'axios';
-import { useTheme } from '../contexts/ThemeContext'; // Asegúrate de que la ruta sea correcta
+import { useTheme } from '../contexts/ThemeContext'; // Contex of the theme
 
 const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
-  const { isDarkMode, toggleDarkMode } = useTheme(); // Usar contexto global para el tema
+  const { isDarkMode, toggleDarkMode } = useTheme();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+
+  const { isLoaded, isSignedIn, user: clerkUser } = useUser(); // Hook of Clerk
 
   const handleNavigation = (screen: string) => {
     navigation.navigate(screen);
   };
 
-  // Función para obtener datos del usuario
-  const fetchUserData = async () => {
+  // Function for obtain user data from backend
+  const fetchUserFromDatabase = async () => {
     try {
-      const token = await AsyncStorage.getItem('token'); // Recupera el token
-      if (!token) throw new Error('Token no encontrado');
+      const token = await AsyncStorage.getItem('token'); // Bring token from storage
+      if (!token) throw new Error('Token not found in storage'); // If token not found
 
-      const response = await axios.get('http://192.168.100.128:8000/auth/user', {
-        headers: { Authorization: `Bearer ${token}` }, // Envía el token como encabezado
+      const response = await axios.get('http://192.168.0.109:8000/auth/user', {
+        headers: { Authorization: `Bearer ${token}` }, // Send token in headers
       });
 
-      setUser(response.data); // Actualiza el estado con los datos del usuario
+      setUser(response.data); // Update user state
     } catch (error) {
-      console.error('Error al obtener datos del usuario:', error);
+      console.error('Error getting user data from database:', error);
     } finally {
-      setLoading(false); // Finaliza el indicador de carga
+      setLoading(false);
     }
   };
 
+  // Function for obtain user data from Clerk
+  const fetchUserFromClerk = () => {
+    if (isLoaded && isSignedIn && clerkUser) {
+      setUser({
+        nombre: clerkUser.firstName || 'User',
+        email: clerkUser.emailAddresses[0]?.emailAddress || 'No email',
+      });
+      setLoading(false);
+    }
+  };
+
+  // Clerk or BD?
   useEffect(() => {
+    const fetchUserData = async () => {
+      if (isLoaded && isSignedIn) {
+        // Auth with Clerk
+        fetchUserFromClerk();
+      } else {
+        // Clerk search in the BD
+        await fetchUserFromDatabase();
+      }
+    };
+
     fetchUserData();
-  }, []);
+  }, [isLoaded, isSignedIn]);
+
+  // Logout function
+  const handleLogout = async () => {
+    Alert.alert(
+      'Cerrar Sesión',
+      '¿Estás seguro de que deseas cerrar sesión?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Aceptar',
+          onPress: async () => {
+            try {
+              await AsyncStorage.removeItem('token'); // Clean Storage Token
+              navigation.navigate('Login'); // Go to Login
+            } catch (error) {
+              console.error('Error logging out:', error);
+            }
+          },
+        },
+      ],
+      { cancelable: true }
+    );
+  };
 
   const dynamicStyles = getDynamicStyles(isDarkMode);
 
@@ -59,11 +108,11 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     <SafeAreaView style={dynamicStyles.container}>
       <View style={dynamicStyles.profileSection}>
         <Image
-          source={require('../../assets/profile-placeholder.png')} // Imagen por defecto
+          source={require('../../assets/profile-placeholder.png')}
           style={dynamicStyles.profileImage}
         />
-        <Text style={dynamicStyles.profileName}>{user?.nombre || 'Usuario'}</Text>
-        <Text style={dynamicStyles.profileSubtitle}>Ver Perfil</Text>
+        <Text style={dynamicStyles.profileName}>{user?.nombre || 'User'}</Text>
+        <Text style={dynamicStyles.profileSubtitle}>{user?.email || ''}</Text>
       </View>
       <View style={dynamicStyles.menuItems}>
         <TouchableOpacity style={dynamicStyles.menuItem} onPress={() => handleNavigation('Home')}>
@@ -72,28 +121,31 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         </TouchableOpacity>
         <TouchableOpacity style={dynamicStyles.menuItem} onPress={() => console.log('Mis Compras')}>
           <Icon name="favorite" size={24} color={isDarkMode ? '#fff' : '#000'} />
-          <Text style={dynamicStyles.menuText}>Mis Compras</Text>
+          <Text style={dynamicStyles.menuText}>My Purchases</Text>
         </TouchableOpacity>
         <TouchableOpacity style={dynamicStyles.menuItem} onPress={() => console.log('Catálogo')}>
           <Icon name="view-list" size={24} color={isDarkMode ? '#fff' : '#000'} />
-          <Text style={dynamicStyles.menuText}>Catálogo</Text>
+          <Text style={dynamicStyles.menuText}>Catalog</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={dynamicStyles.menuItem} onPress={() => navigation.navigate('CartScreen')}>
+        <TouchableOpacity
+          style={dynamicStyles.menuItem}
+          onPress={() => navigation.navigate('CartScreen')}
+        >
           <Icon name="shopping-cart" size={24} color={isDarkMode ? '#fff' : '#000'} />
-          <Text style={dynamicStyles.menuText}>Carrito de compras</Text>
+          <Text style={dynamicStyles.menuText}>Shopping cart</Text>
         </TouchableOpacity>
         <View style={dynamicStyles.menuItem}>
           <Icon name="brightness-6" size={24} color={isDarkMode ? '#fff' : '#000'} />
-          <Text style={dynamicStyles.menuText}>Modo Oscuro</Text>
+          <Text style={dynamicStyles.menuText}>Dark Mode</Text>
           <Switch value={isDarkMode} onValueChange={toggleDarkMode} />
         </View>
         <TouchableOpacity style={dynamicStyles.menuItem} onPress={() => console.log('Ayuda')}>
           <Icon name="help-outline" size={24} color={isDarkMode ? '#fff' : '#000'} />
-          <Text style={dynamicStyles.menuText}>Ayuda</Text>
+          <Text style={dynamicStyles.menuText}>Help</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={dynamicStyles.menuItem} onPress={() => console.log('Cerrar Sesión')}>
+        <TouchableOpacity style={dynamicStyles.menuItem} onPress={handleLogout}>
           <Icon name="logout" size={24} color={isDarkMode ? '#fff' : '#000'} />
-          <Text style={dynamicStyles.menuText}>Cerrar Sesión</Text>
+          <Text style={dynamicStyles.menuText}>Log out</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

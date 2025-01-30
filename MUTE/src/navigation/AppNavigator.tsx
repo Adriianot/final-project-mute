@@ -1,6 +1,6 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
-import { useTheme } from '../contexts/ThemeContext'; // Importa el contexto del tema
+import { useTheme } from '../contexts/ThemeContext'; // Import the context of the theme
 import LoginScreen from '../screens/LoginScreen';
 import HomeScreen from '../screens/HomeScreen';
 import RegisterScreen from '../screens/RegisterScreen';
@@ -20,24 +20,24 @@ export type RootStackParamList = {
 const Stack = createStackNavigator<RootStackParamList>();
 
 const AppNavigator: React.FC = () => {
-  const { isDarkMode } = useTheme(); // Accede al estado del tema
+  const { isDarkMode } = useTheme(); // Go to the context and get the theme
 
   return (
     <Stack.Navigator
       initialRouteName="Login"
       screenOptions={{
         headerStyle: {
-          backgroundColor: isDarkMode ? '#121212' : '#ffffff', // Fondo del encabezado
+          backgroundColor: isDarkMode ? '#121212' : '#ffffff', // Background color of the header
         },
-        headerTintColor: isDarkMode ? '#ffffff' : '#000000', // Color del texto
+        headerTintColor: isDarkMode ? '#ffffff' : '#000000', // Text color
       }}
     >
       <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
-      <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'Registro' }} />
-      <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Inicio' }} />
-      <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} options={{ title: '¿Olvidó su contraseña?' }} />
-      <Stack.Screen name="Menu" component={MenuScreen} options={{ title: 'Menú' }} />
-      <Stack.Screen name="CartScreen" component={CartScreen} options={{ title: 'Compra' }} />
+      <Stack.Screen name="Register" component={RegisterScreen} options={{ title: 'Register' }} />
+      <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Home' }} />
+      <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} options={{ title: '¿Forgot Password?' }} />
+      <Stack.Screen name="Menu" component={MenuScreen} options={{ title: 'Menu' }} />
+      <Stack.Screen name="CartScreen" component={CartScreen} options={{ title: 'Your cart' }} />
     </Stack.Navigator>
   );
 };

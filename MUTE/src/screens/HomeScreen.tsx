@@ -180,7 +180,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           ))}
         </ViewPager>
         <View style={dynamicStyles.featuredSection}>
-          <Text style={dynamicStyles.sectionTitle}>Productos Destacados</Text>
+          <Text style={dynamicStyles.sectionTitle}>Featured Products</Text>
           <View style={dynamicStyles.productsGrid}>
             {FEATURED_PRODUCTS.map((product) => (
               <ProductCard
