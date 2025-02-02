@@ -10,11 +10,15 @@ import {
 import { useTheme } from '../contexts/ThemeContext';
 import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
+
+type CartScreenNavigationProp = StackNavigationProp<RootStackParamList, 'CartScreen'>;
 
 const CartScreen: React.FC = () => {
   const { isDarkMode } = useTheme();
   const dynamicStyles = getDynamicStyles(isDarkMode);
-  const navigation = useNavigation();
+  const navigation = useNavigation<CartScreenNavigationProp>();
 
   const [cartItems, setCartItems] = useState([
     { id: '1', name: "Nike Air Force 1 Shadow Women's Shoes", price: 114.97, quantity: 1, image: require('../../assets/nike1.jpg') },
@@ -73,7 +77,9 @@ const CartScreen: React.FC = () => {
       />
       <View style={dynamicStyles.footer}>
         <Text style={dynamicStyles.totalText}>TOTAL: ${calculateTotal().toFixed(2)}</Text>
-        <TouchableOpacity style={dynamicStyles.confirmButton}>
+        <TouchableOpacity style={dynamicStyles.confirmButton}
+        onPress={() => navigation.navigate('ConfirmScreen', { total: calculateTotal() })}
+        >
           <Text style={dynamicStyles.confirmButtonText}>Confirm</Text>
         </TouchableOpacity>
       </View>

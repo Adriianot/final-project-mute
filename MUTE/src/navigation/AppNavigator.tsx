@@ -7,6 +7,7 @@ import RegisterScreen from '../screens/RegisterScreen';
 import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
 import MenuScreen from '../screens/MenuScreen';
 import CartScreen from '../screens/CartScreen';
+import ConfirmScreen from '../screens/ConfirmScreen';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -15,6 +16,7 @@ export type RootStackParamList = {
   ForgotPassword: undefined;
   Menu: undefined;
   CartScreen: undefined;
+  ConfirmScreen: { total: number };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -38,6 +40,7 @@ const AppNavigator: React.FC = () => {
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} options={{ title: '¿Forgot Password?' }} />
       <Stack.Screen name="Menu" component={MenuScreen} options={{ title: 'Menu' }} />
       <Stack.Screen name="CartScreen" component={CartScreen} options={{ title: 'Your cart' }} />
+      <Stack.Screen name="ConfirmScreen" component={ConfirmScreen} options={{ title: 'Confirm Order'  }} />
     </Stack.Navigator>
   );
 };
