@@ -6,11 +6,6 @@ from app.database import clientes_collection
 
 router = APIRouter()
 
-# Modelo para validar los datos del login
-# class LoginRequest(BaseModel):
-#     email: EmailStr
-#     password: str
-
 @router.post("/login")
 async def login(login_data: LoginRequest): 
 

@@ -20,4 +20,4 @@ class Producto(BaseModel):
     imagen: str
     categoria: Optional[str] = None
     marca: Optional[str] = None
-    genero: Optional[str] = "unisex"  # Opciones: hombre, mujer, unisex
+    genero: Optional[str] = "unisex" 

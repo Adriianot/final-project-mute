@@ -34,7 +34,7 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       const token = await AsyncStorage.getItem('token');
       if (!token) throw new Error('Token not found in storage');
 
-      const response = await axios.get('http://192.168.189.87:8000/auth/user', {
+      const response = await axios.get('http://192.168.100.128:8000/auth/user', {
         headers: { Authorization: `Bearer ${token}` },
       });
 

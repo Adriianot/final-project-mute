@@ -8,7 +8,6 @@ import {
   TouchableOpacity,
   StatusBar,
   Dimensions,
-  ImageSourcePropType,
   SafeAreaView,
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -16,11 +15,8 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 import ViewPager from 'react-native-pager-view';
 import { useTheme } from '../contexts/ThemeContext';
 
-// Screens
 type RootStackParamList = {
   Home: undefined;
-  Login: undefined;
-  Register: undefined;
   ProductDetail: { productId: string };
   CartScreen: undefined;
   Menu: undefined;
@@ -30,42 +26,20 @@ type HomeScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, 'Home'>;
 };
 
-// Interfaces
 interface Product {
-  id: string;
-  image: ImageSourcePropType;
-  title: string;
-  price: string;
-}
-
-interface BannerItem {
-  id: string;
-  image: ImageSourcePropType;
+  nombre: string;
+  imagen: string;
+  precio: number;
 }
 
 // Constants
 const { width: windowWidth } = Dimensions.get('window');
 
-const BANNER_ITEMS: BannerItem[] = [
+const BANNER_ITEMS: { id: string; image: any }[] = [
   { id: '1', image: require('../../assets/banner1.jpg') },
   { id: '2', image: require('../../assets/banner2.jpg') },
   { id: '3', image: require('../../assets/banner3.jpg') },
   { id: '4', image: require('../../assets/banner4.jpg') },
-];
-
-const FEATURED_PRODUCTS: Product[] = [
-  {
-    id: '1',
-    image: require('../../assets/placeholder.jpg'),
-    title: 'Pants Sport',
-    price: '$59.99',
-  },
-  {
-    id: '2',
-    image: require('../../assets/placeholder.jpg'),
-    title: 'Nike Sneakers',
-    price: '$89.99',
-  },
 ];
 
 // Components
@@ -95,102 +69,69 @@ const Header: React.FC<{
   );
 };
 
-const ProductCard: React.FC<Product & { onPress: (productId: string) => void; isDarkMode: boolean }> = ({
-  id,
-  image,
-  title,
-  price,
-  onPress,
-  isDarkMode,
-}) => {
-  const dynamicStyles = getDynamicStyles(isDarkMode);
-
-  return (
-    <TouchableOpacity style={dynamicStyles.productCard} onPress={() => onPress(id)}>
-      <Image source={image} style={dynamicStyles.productImage} resizeMode="cover" />
-      <Text style={dynamicStyles.productTitle}>{title}</Text>
-      <Text style={dynamicStyles.productPrice}>{price}</Text>
-    </TouchableOpacity>
-  );
-};
-
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const { isDarkMode } = useTheme();
   const dynamicStyles = getDynamicStyles(isDarkMode);
 
-  const [currentPage, setCurrentPage] = useState(0);
-  const viewPagerRef = useRef<ViewPager>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentPage((prevPage) => (prevPage + 1) % BANNER_ITEMS.length);
-    }, 3000);
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('http://192.168.100.128:8000/auth/productos'); // Cambia si usas otro host
+        const data = await response.json();
+        setProducts(data);
+      } catch (error) {
+        console.error("Error al obtener productos:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    return () => clearInterval(interval);
+    fetchProducts();
   }, []);
 
-  useEffect(() => {
-    if (viewPagerRef.current) {
-      viewPagerRef.current.setPage(currentPage);
-    }
-  }, [currentPage]);
-
-  const handleProductPress = useCallback(
-    (productId: string) => {
-      navigation.navigate('ProductDetail', { productId });
-    },
-    [navigation]
-  );
-
-  const handleCartPress = useCallback(() => {
-    navigation.navigate('CartScreen');
-  }, [navigation]);
-
-  const handleMenuPress = useCallback(() => {
-    navigation.navigate('Menu');
-  }, [navigation]);
-
-  const handleSearchPress = useCallback(() => {
-    console.log('Search pressed');
-  }, []);
+  const handleProductPress = (productName: string) => {
+    navigation.navigate('ProductDetail', { productId: productName });
+  };
 
   return (
     <SafeAreaView style={dynamicStyles.container}>
-      <StatusBar
-        backgroundColor={isDarkMode ? '#121212' : '#ffffff'}
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-      />
+      <StatusBar backgroundColor={isDarkMode ? '#121212' : '#ffffff'} barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
       <Header
-        onMenuPress={handleMenuPress}
-        onSearchPress={handleSearchPress}
-        onCartPress={handleCartPress}
+        onMenuPress={() => navigation.navigate('Menu')}
+        onSearchPress={() => console.log('Search pressed')}
+        onCartPress={() => navigation.navigate('CartScreen')}
         isDarkMode={isDarkMode}
       />
       <ScrollView showsVerticalScrollIndicator={false} style={dynamicStyles.scrollView}>
-        <ViewPager
-          style={dynamicStyles.viewPager}
-          initialPage={0}
-          ref={viewPagerRef}
-          onPageSelected={(e) => setCurrentPage(e.nativeEvent.position)}
-        >
+        
+        {/* Banners */}
+        <ViewPager style={dynamicStyles.viewPager} initialPage={0}>
           {BANNER_ITEMS.map((item) => (
             <View key={item.id} style={dynamicStyles.bannerPage}>
               <Image source={item.image} style={dynamicStyles.bannerImage} resizeMode="cover" />
             </View>
           ))}
         </ViewPager>
+
+        {/* Productos Destacados */}
         <View style={dynamicStyles.featuredSection}>
-          <Text style={dynamicStyles.sectionTitle}>Featured Products</Text>
-          <View style={dynamicStyles.productsGrid}>
-            {FEATURED_PRODUCTS.map((product) => (
-              <ProductCard
-                key={product.id}
-                {...product}
-                onPress={handleProductPress}
-                isDarkMode={isDarkMode}
-              />
-            ))}
-          </View>
+          <Text style={dynamicStyles.sectionTitle}>Productos Destacados</Text>
+          {loading ? (
+            <Text style={dynamicStyles.loadingText}>Cargando productos...</Text>
+          ) : (
+            <View style={dynamicStyles.productsGrid}>
+              {products.map((product, index) => (
+                <TouchableOpacity key={index} style={dynamicStyles.productCard} onPress={() => handleProductPress(product.nombre)}>
+                  <Image source={{ uri: product.imagen }} style={dynamicStyles.productImage} resizeMode="cover" />
+                  <Text style={dynamicStyles.productTitle}>{product.nombre}</Text>
+                  <Text style={dynamicStyles.productPrice}>${product.precio.toFixed(2)}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -218,6 +159,7 @@ const getDynamicStyles = (isDarkMode: boolean) =>
     bannerImage: { width: '100%', height: '100%' },
     featuredSection: { padding: 16 },
     sectionTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 16, color: isDarkMode ? '#ffffff' : '#000000' },
+    loadingText: { textAlign: 'center', fontSize: 16, marginVertical: 10, color: isDarkMode ? '#ffffff' : '#000000' },
     productsGrid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
     productCard: {
       width: (windowWidth - 48) / 2,

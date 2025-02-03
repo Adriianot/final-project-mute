@@ -15,7 +15,7 @@ export const GoogleLogin = () => {
 
   const handleGoogleLogin = async (token: string) => {
     try {
-      const res = await fetch("https://192.168.189.87:8000/auth/google", {
+      const res = await fetch("https://192.168.100.128:8000/auth/google", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token }),
