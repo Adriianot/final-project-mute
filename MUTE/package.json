@@ -53,7 +53,8 @@
     "react-native-snap-carousel": "^3.9.1",
     "react-native-vector-icons": "^10.2.0",
     "react-native-web": "~0.19.13",
-    "undefined": "expo-auth-session/providers/google"
+    "undefined": "expo-auth-session/providers/google",
+    "expo-speech": "~13.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

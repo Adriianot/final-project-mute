@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routes import auth, login, user, clerk, product
+from app.routes import auth, login, user, clerk, product,chat
 
 app = FastAPI()
 
@@ -9,3 +9,4 @@ app.include_router(login.router, prefix="/auth", tags=["Login"])
 app.include_router(user.router, prefix="/auth", tags=["Auth"])
 app.include_router(clerk.router, prefix="/auth", tags=["Auth"])
 app.include_router(product.router, prefix="/auth", tags=["Products"])
+app.include_router(chat.router, prefix="/chat", tags=["Chatbot"]) 
