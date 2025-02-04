@@ -5,6 +5,7 @@ import { AuthProvider } from './src/contexts/AuthContext'; // Autenticación
 import { ClerkProvider } from '@clerk/clerk-expo'; // Clerk para autenticación
 import { ClerkAuthProvider } from './src/contexts/ClerkContext'; // Contexto de Clerk
 import { ThemeProvider } from './src/contexts/ThemeContext'; // Contexto para tema
+import { CartProvider } from "./src/contexts/CartContext"; 
 
 const publishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!;
 
@@ -20,9 +21,11 @@ const App: React.FC = () => {
       <ClerkAuthProvider>
         <AuthProvider>
           <ThemeProvider>
+          <CartProvider>
             <NavigationContainer>
               <AppNavigator />
             </NavigationContainer>
+          </CartProvider>
           </ThemeProvider>
         </AuthProvider>
       </ClerkAuthProvider>

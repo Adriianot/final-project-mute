@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   View,
   Text,
   Image,
-  StyleSheet,
   FlatList,
   TouchableOpacity,
 } from "react-native";
@@ -13,6 +12,7 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { getDynamicStyles } from "../styles/cartStyles";
+import { useCart } from "../contexts/CartContext"; // Importamos el contexto del carrito
 
 type CartScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -24,71 +24,29 @@ const CartScreen: React.FC = () => {
   const dynamicStyles = getDynamicStyles(isDarkMode);
   const navigation = useNavigation<CartScreenNavigationProp>();
 
-  const [cartItems, setCartItems] = useState([
-    {
-      id: "1",
-      name: "Nike Air Force 1 Shadow Women's Shoes",
-      price: 114.97,
-      quantity: 1,
-      image: require("../../assets/nike1.jpg"),
-    },
-    {
-      id: "2",
-      name: "Nike Sportswear Classic Women's Leggings",
-      price: 43.97,
-      quantity: 1,
-      image: require("../../assets/nike2.jpg"),
-    },
-    {
-      id: "3",
-      name: "Nike CITY Shoes",
-      price: 100,
-      quantity: 1,
-      image: require("../../assets/nike3.jpg"),
-    },
-    {
-      id: "4",
-      name: "Nike Wool Classics Water-Repellent Jacket",
-      price: 400,
-      quantity: 1,
-      image: require("../../assets/nike4.jpg"),
-    },
-  ]);
+  const { cartItems, updateQuantity, removeFromCart } = useCart(); // Usamos el contexto del carrito
 
   const calculateTotal = () =>
-    cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
-
-  const updateQuantity = (id: string, action: "increase" | "decrease") => {
-    setCartItems((prevItems) =>
-      prevItems
-        .map((item) =>
-          item.id === id
-            ? {
-                ...item,
-                quantity: item.quantity + (action === "increase" ? 1 : -1),
-              }
-            : item
-        )
-        .filter((item) => item.quantity > 0)
-    );
-  };
+    cartItems.reduce((total, item) => total + item.precio * item.cantidad, 0);
 
   const renderCartItem = ({
     item,
   }: {
     item: {
       id: string;
-      name: string;
-      price: number;
-      quantity: number;
-      image: any;
+      nombre: string;
+      precio: number;
+      talla: string;
+      cantidad: number;
+      imagen: string;
     };
   }) => (
     <View style={dynamicStyles.cartItem}>
-      <Image source={item.image} style={dynamicStyles.cartImage} />
+      <Image source={{ uri: item.imagen }} style={dynamicStyles.cartImage} />
       <View style={dynamicStyles.cartDetails}>
-        <Text style={dynamicStyles.itemName}>{item.name}</Text>
-        <Text style={dynamicStyles.itemPrice}>${item.price.toFixed(2)}</Text>
+        <Text style={dynamicStyles.itemName}>{item.nombre}</Text>
+        <Text style={dynamicStyles.itemPrice}>Talla: {item.talla}</Text>
+        <Text style={dynamicStyles.itemPrice}>${item.precio.toFixed(2)}</Text>
       </View>
       <View style={dynamicStyles.cartQuantity}>
         <TouchableOpacity
@@ -97,7 +55,7 @@ const CartScreen: React.FC = () => {
         >
           <Text style={dynamicStyles.buttonText}>-</Text>
         </TouchableOpacity>
-        <Text style={dynamicStyles.quantityText}>{item.quantity}</Text>
+        <Text style={dynamicStyles.quantityText}>{item.cantidad}</Text>
         <TouchableOpacity
           style={dynamicStyles.quantityButton}
           onPress={() => updateQuantity(item.id, "increase")}
@@ -105,6 +63,12 @@ const CartScreen: React.FC = () => {
           <Text style={dynamicStyles.buttonText}>+</Text>
         </TouchableOpacity>
       </View>
+      <TouchableOpacity
+        style={dynamicStyles.quantityButton}
+        onPress={() => removeFromCart(item.id)}
+      >
+        <Icon name="delete" size={24} color="red" />
+      </TouchableOpacity>
     </View>
   );
 
@@ -112,19 +76,22 @@ const CartScreen: React.FC = () => {
     <View style={dynamicStyles.container}>
       <View style={dynamicStyles.header}>
         <Text style={dynamicStyles.headerTitle}>Shopping Cart</Text>
-
         <Icon
           name="shopping-cart"
           size={24}
           color={isDarkMode ? "#ffffff" : "#000000"}
         />
       </View>
-      <FlatList
-        data={cartItems}
-        keyExtractor={(item) => item.id}
-        renderItem={renderCartItem}
-        style={dynamicStyles.cartList}
-      />
+      {cartItems.length > 0 ? (
+        <FlatList
+          data={cartItems}
+          keyExtractor={(item) => item.id}
+          renderItem={renderCartItem}
+          contentContainerStyle={dynamicStyles.cartList}
+        />
+      ) : (
+        <Text style={dynamicStyles.totalText}>Tu carrito está vacío</Text>
+      )}
       <View style={dynamicStyles.footer}>
         <Text style={dynamicStyles.totalText}>
           TOTAL: ${calculateTotal().toFixed(2)}
@@ -134,8 +101,9 @@ const CartScreen: React.FC = () => {
           onPress={() =>
             navigation.navigate("ConfirmScreen", { total: calculateTotal() })
           }
+          disabled={cartItems.length === 0}
         >
-          <Text style={dynamicStyles.confirmButtonText}>Confirm</Text>
+          <Text style={dynamicStyles.confirmButtonText}>Confirmar Compra</Text>
         </TouchableOpacity>
       </View>
     </View>

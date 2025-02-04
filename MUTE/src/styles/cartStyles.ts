@@ -17,7 +17,7 @@ const getDynamicStyles = (isDarkMode: boolean) =>
         fontWeight: "bold",
         color: isDarkMode ? "#ffffff" : "#000000",
       },
-      cartList: { padding: 16 },
+      cartList: {flexGrow: 1, padding: 16 },
       cartItem: {
         flexDirection: "row",
         marginBottom: 16,
@@ -58,12 +58,20 @@ const getDynamicStyles = (isDarkMode: boolean) =>
         color: isDarkMode ? "#ffffff" : "#000000",
       },
       footer: {
-        padding: 20,
+        position: "absolute", // Lo fija en la parte inferior
+        bottom: 0,
+        left: 0,
+        right: 0,
+        height: 120,
+        paddingVertical: 16,
+        paddingHorizontal: 40,
         borderTopWidth: 1,
         borderColor: isDarkMode ? "#333333" : "#eeeeee",
         backgroundColor: isDarkMode ? "#1e1e1e" : "#ffffff",
+        justifyContent: "center",
       },
       totalText: {
+        left: 15,
         fontSize: 18,
         fontWeight: "bold",
         color: isDarkMode ? "#ffffff" : "#000000",

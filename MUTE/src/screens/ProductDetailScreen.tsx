@@ -8,6 +8,7 @@ import {
   ScrollView,
   Dimensions,
   Modal,
+  Alert,
 } from "react-native";
 import { useTheme } from "../contexts/ThemeContext";
 import { StackScreenProps } from "@react-navigation/stack";
@@ -15,10 +16,9 @@ import { RootStackParamList } from "../navigation/AppNavigator";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { Product } from "../interfaces/types";
 import { getDynamicStyles } from "../styles/productStyles";
+import { useCart } from "../contexts/CartContext";
 
 type ProductDetailProps = StackScreenProps<RootStackParamList, "ProductDetail">;
-
-const { width: windowWidth } = Dimensions.get("window");
 
 const availableSizes = ["S", "M", "L", "XL"]; // Tallas predefinidas
 
@@ -29,17 +29,33 @@ const ProductDetailScreen: React.FC<ProductDetailProps> = ({
   const { isDarkMode } = useTheme();
   const dynamicStyles = getDynamicStyles(isDarkMode);
   const { product } = route.params;
+  const { addToCart } = useCart(); 
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [quantity, setQuantity] = useState(1);
 
   const handleAddToCart = () => {
-    if (!selectedSize) return;
-    console.log("Añadiendo al carrito:", {
+    if (!selectedSize) {
+      Alert.alert("⚠️ Selección requerida", "Por favor, elige una talla antes de agregar al carrito.");
+      return;
+    }
+  
+    const newItem = {
+      id: product.nombre + selectedSize,
       nombre: product.nombre,
       precio: product.precio,
       talla: selectedSize,
-    });
+      cantidad: quantity,
+      imagen: product.imagen,
+    };
+  
+    addToCart(newItem);
+
+    Alert.alert(
+      "✅ Producto agregado",
+      `${product.nombre} (${selectedSize}) se agregó al carrito con éxito.`,
+      [{ text: "OK" }]
+    );
   };
 
   return (
@@ -92,15 +108,7 @@ const ProductDetailScreen: React.FC<ProductDetailProps> = ({
             !selectedSize && dynamicStyles.disabledButton,
           ]}
           disabled={!selectedSize}
-          onPress={() => {
-            if (!selectedSize) return;
-            console.log("Añadiendo al carrito:", {
-              nombre: product.nombre,
-              precio: product.precio,
-              talla: selectedSize,
-              cantidad: quantity, // Se envía la cantidad seleccionada
-            });
-          }}
+          onPress={handleAddToCart} 
         >
           <Icon name="shopping-cart" size={24} color="#fff" />
           <Text style={dynamicStyles.addButtonText}>Agregar al carrito</Text>
