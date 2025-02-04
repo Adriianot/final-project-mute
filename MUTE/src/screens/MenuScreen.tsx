@@ -198,17 +198,6 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={dynamicStyles.menuItem}
-          onPress={() => console.log("Catálogo")}
-        >
-          <Icon
-            name="view-list"
-            size={24}
-            color={isDarkMode ? "#fff" : "#000"}
-          />
-          <Text style={dynamicStyles.menuText}>Catalog</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={dynamicStyles.menuItem}
           onPress={() => navigation.navigate("CartScreen")}
         >
           <Icon
