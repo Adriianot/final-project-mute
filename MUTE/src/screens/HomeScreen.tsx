@@ -91,7 +91,7 @@ const Header: React.FC<{
       ) : (
         <TextInput
           style={dynamicStyles.searchInput}
-          placeholder="Buscar productos..."
+          placeholder="Search products..."
           placeholderTextColor={isDarkMode ? "#bbbbbb" : "#666666"}
           onChangeText={onSearch}
           autoFocus

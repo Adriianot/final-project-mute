@@ -76,7 +76,6 @@ const getDynamicStyles = (isDarkMode: boolean) =>
   
       disabledButton: { backgroundColor: "#ccc" },
   
-      // Estilos para el modal
       modalContainer: {
         flex: 1,
         justifyContent: "center",
@@ -141,13 +140,14 @@ const getDynamicStyles = (isDarkMode: boolean) =>
       },
       counterButtonText: {
         fontSize: 24,
-        color: "#FFF",
+        color: isDarkMode ? "#ffffff" : "#000000",
         fontWeight: "bold",
       },
       counterText: {
         fontSize: 18,
         fontWeight: "bold",
         marginHorizontal: 15,
+        color: isDarkMode ? "#ffffff" : "#000000",
       },
     });
   
