@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   View,
   Text,
-  StyleSheet,
   Image,
   ScrollView,
   TouchableOpacity,
@@ -16,6 +15,7 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import ViewPager from "react-native-pager-view";
 import { useTheme } from "../contexts/ThemeContext";
 import { useDebounce } from "../hooks/useDebounce";
+import { getDynamicStyles } from "../styles/homeStyles";
 
 type RootStackParamList = {
   Home: undefined;
@@ -51,6 +51,14 @@ const BANNER_ITEMS: { id: string; image: any }[] = [
 ];
 
 // Components
+const CATEGORIES = [
+  "Todos",
+  "Pantalones",
+  "Calzado",
+  "Shorts",
+  "Chaquetas",
+  "Accesorios",
+];
 const Header: React.FC<{
   onMenuPress: () => void;
   onCartPress: () => void;
@@ -125,6 +133,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
   const [isSearching, setIsSearching] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("Todos");
 
   //  `useDebounce` 300ms
   const debouncedSearch = useDebounce(searchText, 300);
@@ -152,30 +161,28 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
     fetchProducts();
   }, []);
+// desde aquí
+useEffect(() => {
+  let filtered = products;
 
-  useEffect(() => {
-    if (debouncedSearch === "") {
-      setFilteredProducts(products);
-    } else {
-      const filtered = products.filter(
-        (product) =>
-          product.nombre
-            .toLowerCase()
-            .includes(debouncedSearch.toLowerCase()) ||
-          product.descripcion
-            ?.toLowerCase()
-            .includes(debouncedSearch.toLowerCase()) ||
-          product.categoria
-            ?.toLowerCase()
-            .includes(debouncedSearch.toLowerCase()) ||
-          product.marca
-            ?.toLowerCase()
-            .includes(debouncedSearch.toLowerCase()) ||
-          product.genero?.toLowerCase().includes(debouncedSearch.toLowerCase())
-      );
-      setFilteredProducts(filtered);
-    }
-  }, [debouncedSearch, products]);
+  if (selectedCategory !== "Todos") {
+    filtered = products.filter(
+      (product) => product.categoria.toLowerCase() === selectedCategory.toLowerCase()
+    );
+  }
+
+  if (debouncedSearch !== "") {
+    filtered = filtered.filter(
+      (product) =>
+        product.nombre.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        product.descripcion?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        product.marca?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+        product.genero?.toLowerCase().includes(debouncedSearch.toLowerCase())
+    );
+  }
+
+  setFilteredProducts(filtered);
+}, [debouncedSearch, products, selectedCategory]);
 
   const handleProductPress = (product: Product) => {
     console.log("Producto seleccionado antes de navegar:", product);
@@ -220,6 +227,27 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         {/* Products*/}
         <View style={dynamicStyles.featuredSection}>
           <Text style={dynamicStyles.sectionTitle}>Products</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={dynamicStyles.categoryScroll}>
+      {CATEGORIES.map((category) => (
+        <TouchableOpacity
+          key={category}
+          style={[
+            dynamicStyles.categoryButton,
+            selectedCategory === category && dynamicStyles.categoryButtonSelected,
+          ]}
+          onPress={() => setSelectedCategory(category)}
+        >
+          <Text
+            style={[
+              dynamicStyles.categoryText,
+              selectedCategory === category && dynamicStyles.categoryTextSelected,
+            ]}
+          >
+            {category}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
           {loading ? (
             <Text style={dynamicStyles.loadingText}>Cargando productos...</Text>
           ) : (
@@ -256,84 +284,5 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     </SafeAreaView>
   );
 };
-
-const getDynamicStyles = (isDarkMode: boolean) =>
-  StyleSheet.create({
-    container: { flex: 1, backgroundColor: isDarkMode ? "#121212" : "#ffffff" },
-    scrollView: { flex: 1 },
-    header: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      height: 56,
-      paddingHorizontal: 16,
-      backgroundColor: isDarkMode ? "#1e1e1e" : "#ffffff",
-      elevation: 4,
-    },
-    headerTitle: {
-      fontSize: 20,
-      fontWeight: "bold",
-      color: isDarkMode ? "#ffffff" : "#000000",
-    },
-    headerRight: { flexDirection: "row" },
-    headerIcon: { marginLeft: 16, padding: 8 },
-    viewPager: { height: 200, marginVertical: 16 },
-    bannerPage: { flex: 1, alignItems: "center", justifyContent: "center" },
-    bannerImage: { width: "100%", height: "100%" },
-    featuredSection: { padding: 16 },
-    sectionTitle: {
-      fontSize: 18,
-      fontWeight: "bold",
-      marginBottom: 16,
-      color: isDarkMode ? "#ffffff" : "#000000",
-    },
-    loadingText: {
-      textAlign: "center",
-      fontSize: 16,
-      marginVertical: 10,
-      color: isDarkMode ? "#ffffff" : "#000000",
-    },
-    productsGrid: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      justifyContent: "space-between",
-    },
-    productCard: {
-      width: (windowWidth - 48) / 2,
-      marginBottom: 16,
-      backgroundColor: isDarkMode ? "#1e1e1e" : "#ffffff",
-      borderRadius: 8,
-      elevation: 2,
-      overflow: "hidden",
-    },
-    productImage: { width: "100%", height: 150 },
-    productTitle: {
-      fontSize: 14,
-      marginTop: 8,
-      marginHorizontal: 8,
-      color: isDarkMode ? "#ffffff" : "#000000",
-    },
-    productPrice: {
-      fontSize: 16,
-      fontWeight: "bold",
-      marginHorizontal: 8,
-      color: isDarkMode ? "#ffffff" : "#000000",
-    },
-    searchInput: {
-      flex: 1,
-      height: 40,
-      backgroundColor: isDarkMode ? "#222222" : "#f0f0f0",
-      borderRadius: 8,
-      paddingHorizontal: 10,
-      color: isDarkMode ? "#ffffff" : "#000000",
-    },
-    noResultsText: {
-      textAlign: "center",
-      fontSize: 16,
-      marginVertical: 20,
-      fontWeight: "bold",
-      color: isDarkMode ? "#ff4444" : "#cc0000",
-    },
-  });
 
 export default HomeScreen;
