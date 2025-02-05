@@ -43,7 +43,7 @@ const ChatAssistantScreen: React.FC<ChatAssistantScreenProps> = ({
   const { isDarkMode } = useTheme();
   const dynamicStyles = getDynamicStyles(isDarkMode);
 
-  const API_URL = "http://192.168.100.128:8000/chat/chatbot";
+  const API_URL = "http://10.119.170.162:8000/chat/chatbot";
 
   // Function to get a response from the chatbot
   const responseChatbot = async (messageQ: string) => {

@@ -35,7 +35,7 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       if (!token) throw new Error("Token not found in storage");
 
       const response = await axios.get(
-        "http://192.168.100.128:8000/auth/user",
+        "http://10.119.170.162:8000/auth/user",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -225,7 +225,7 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
             size={24}
             color={isDarkMode ? "#fff" : "#000"}
           />
-          <Text style={dynamicStyles.menuText}>Ayuda</Text>
+          <Text style={dynamicStyles.menuText}>Help</Text>
         </TouchableOpacity>
         <TouchableOpacity style={dynamicStyles.menuItem} onPress={handleLogout}>
           <Icon name="logout" size={24} color={isDarkMode ? "#fff" : "#000"} />

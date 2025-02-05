@@ -36,7 +36,7 @@ const ProductDetailScreen: React.FC<ProductDetailProps> = ({
 
   const handleAddToCart = () => {
     if (!selectedSize) {
-      Alert.alert("⚠️ Selección requerida", "Por favor, elige una talla antes de agregar al carrito.");
+      Alert.alert("⚠️ Required selection", "Please choose a size before adding to cart.");
       return;
     }
   
@@ -52,8 +52,8 @@ const ProductDetailScreen: React.FC<ProductDetailProps> = ({
     addToCart(newItem);
 
     Alert.alert(
-      "✅ Producto agregado",
-      `${product.nombre} (${selectedSize}) se agregó al carrito con éxito.`,
+      "✅ Product added",
+      `${product.nombre} (${selectedSize}) was added to cart successfully.`,
       [{ text: "OK" }]
     );
   };
@@ -70,19 +70,19 @@ const ProductDetailScreen: React.FC<ProductDetailProps> = ({
         <Text style={dynamicStyles.price}>${product.precio.toFixed(2)}</Text>
 
         {/* 📏 Selección de Tallas */}
-        <Text style={dynamicStyles.sectionTitle}>Selecciona tu talla:</Text>
+        <Text style={dynamicStyles.sectionTitle}>Select your size:</Text>
         <TouchableOpacity
           style={dynamicStyles.sizeSelector}
           onPress={() => setModalVisible(true)}
         >
           <Text style={dynamicStyles.sizeSelectorText}>
-            {selectedSize ? `Talla: ${selectedSize}` : "Elige una talla"}
+            {selectedSize ? `Talla: ${selectedSize}` : "Choose a size"}
           </Text>
           <Icon name="arrow-drop-down" size={24} color="#000" />
         </TouchableOpacity>
 
         {/* 🚻 Género */}
-        <Text style={dynamicStyles.sectionTitle}>Género: {product.genero}</Text>
+        <Text style={dynamicStyles.sectionTitle}>Gender: {product.genero}</Text>
         
         {/* 🔢 Contador de cantidad */}
         <View style={dynamicStyles.counterContainer}>
@@ -111,7 +111,7 @@ const ProductDetailScreen: React.FC<ProductDetailProps> = ({
           onPress={handleAddToCart} 
         >
           <Icon name="shopping-cart" size={24} color="#fff" />
-          <Text style={dynamicStyles.addButtonText}>Agregar al carrito</Text>
+          <Text style={dynamicStyles.addButtonText}>Add to cart</Text>
         </TouchableOpacity>
       </View>
 
@@ -124,7 +124,7 @@ const ProductDetailScreen: React.FC<ProductDetailProps> = ({
       >
         <View style={dynamicStyles.modalContainer}>
           <View style={dynamicStyles.modalContent}>
-            <Text style={dynamicStyles.modalTitle}>Selecciona una talla</Text>
+            <Text style={dynamicStyles.modalTitle}>Select a size </Text>
             <View style={dynamicStyles.modalSizes}>
               {availableSizes.map((size) => (
                 <TouchableOpacity
@@ -153,7 +153,7 @@ const ProductDetailScreen: React.FC<ProductDetailProps> = ({
               style={dynamicStyles.closeModalButton}
               onPress={() => setModalVisible(false)}
             >
-              <Text style={dynamicStyles.closeModalText}>Cerrar</Text>
+              <Text style={dynamicStyles.closeModalText}>Close</Text>
             </TouchableOpacity>
           </View>
         </View>

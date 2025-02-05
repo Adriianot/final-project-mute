@@ -49,7 +49,7 @@ const AppNavigator: React.FC = () => {
       <Stack.Screen name="CartScreen" component={CartScreen} options={{ title: 'Your cart' }} />
       <Stack.Screen name="ConfirmScreen" component={ConfirmScreen} options={{ title: 'Confirm Order'  }} />
       <Stack.Screen name="ProductDetail" component={ProductDetailScreen} options={{ title: 'Product Details' }} />
-      <Stack.Screen name="ChatAssistantScreen" component={ChatAssistantScreen} options={{ title: 'Asistente Virtual' }} />
+      <Stack.Screen name="ChatAssistantScreen" component={ChatAssistantScreen} options={{ title: 'Virtual Assistant' }} />
     </Stack.Navigator>
   );
 };

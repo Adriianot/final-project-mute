@@ -17,6 +17,13 @@ const getDynamicStyles = (isDarkMode: boolean) =>
         textAlign: "center",
         marginBottom: 20,
       },
+      sectionTitle: { // ✅ Agregamos este estilo faltante
+        fontSize: 18,
+        fontWeight: "bold",
+        marginTop: 20,
+        marginBottom: 5,
+        color: isDarkMode ? "#ffffff" : "#000000",
+      },
       input: {
         borderWidth: 1,
         borderColor: isDarkMode ? "#555" : "#ccc",
@@ -39,6 +46,10 @@ const getDynamicStyles = (isDarkMode: boolean) =>
         paddingVertical: 12,
         borderRadius: 8,
         alignItems: "center",
+      },
+      scrollContainer: { // ✅ Para que ScrollView tenga margen y no corte el contenido
+        flexGrow: 1,
+        padding: 0,
       },
       confirmButtonText: { fontSize: 16, color: "#ffffff", fontWeight: "bold" },
       logoContainer: {
@@ -78,6 +89,35 @@ const getDynamicStyles = (isDarkMode: boolean) =>
         fontWeight: "bold",
         color: isDarkMode ? "#ffffff" : "#000000",
         marginBottom: 20,
+      },
+      map: {
+        width: "100%",
+        height: 200,
+        borderRadius: 10,
+        marginVertical: 10,
+      },
+      errorText: {
+        fontSize: 14,
+        color: "red",
+        textAlign: "center",
+        marginBottom: 10,
+      },
+      resetButton: { 
+        backgroundColor: "#007AFF", 
+        padding: 10, 
+        borderRadius: 5, 
+        alignItems: "center",
+        marginTop: 10,
+      },
+      resetButtonText: { 
+        color: "#ffffff", 
+        fontWeight: "bold", 
+        fontSize: 14,
+      },
+      disabledButton: {
+
+        backgroundColor: "#cccccc",
+    
       },
     });
   
