@@ -142,7 +142,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     const fetchProducts = async () => {
       try {
         const response = await fetch(
-          "http://10.119.170.162:8000/auth/productos"
+          "http://192.168.100.128:8000/auth/productos"
         );
         const data = await response.json();
         const productsWithTallas = data.map((product: Product) => ({

@@ -21,7 +21,7 @@ export type RootStackParamList = {
   ForgotPassword: undefined;
   Menu: undefined;
   CartScreen: undefined;
-  ConfirmScreen: { total: number };
+  ConfirmScreen: { total: number; cartItems: any[] };
   ProductDetail: { product: Product };
   ChatAssistantScreen: undefined; 
 };

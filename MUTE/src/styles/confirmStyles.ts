@@ -41,9 +41,10 @@ const getDynamicStyles = (isDarkMode: boolean) =>
         marginTop: 20,
       },
       confirmButton: {
-        marginTop: 16,
+        marginTop: 20,
         backgroundColor: "#ff5722",
         paddingVertical: 12,
+        paddingHorizontal: 12,
         borderRadius: 8,
         alignItems: "center",
       },
@@ -118,6 +119,18 @@ const getDynamicStyles = (isDarkMode: boolean) =>
 
         backgroundColor: "#cccccc",
     
+      },
+      modalContent: {
+        backgroundColor: isDarkMode ? "#1e1e1e" : "#ffffff",
+        padding: 20,
+        borderRadius: 10,
+        alignItems: "center",
+        width: "80%",
+      },
+      modalImage: {
+        width: 100,
+        height: 100,
+        marginVertical: 20,
       },
     });
   

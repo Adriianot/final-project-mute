@@ -99,7 +99,7 @@ const CartScreen: React.FC = () => {
         <TouchableOpacity
           style={dynamicStyles.confirmButton}
           onPress={() =>
-            navigation.navigate("ConfirmScreen", { total: calculateTotal() })
+            navigation.navigate("ConfirmScreen", { total: calculateTotal(), cartItems: cartItems,})
           }
           disabled={cartItems.length === 0}
         >

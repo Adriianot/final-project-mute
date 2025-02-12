@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel, EmailStr
 
 class ClienteRegistro(BaseModel):
@@ -21,3 +21,21 @@ class Producto(BaseModel):
     categoria: Optional[str] = None
     marca: Optional[str] = None
     genero: Optional[str] = "unisex" 
+
+class CompraItem(BaseModel):
+    id: str
+    nombre: str
+    precio: float
+    talla: str
+    cantidad: int
+    imagen: Optional[str] = None
+
+class Compra(BaseModel):
+    cliente_id: Optional[str] = None
+    cliente_email: EmailStr
+    total: float
+    productos: List[CompraItem]
+    telefono: str
+    direccion: str
+    ubicacion: Optional[dict] = None
+    metodo_pago: str

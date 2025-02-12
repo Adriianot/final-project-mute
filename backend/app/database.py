@@ -12,3 +12,5 @@ db = client["mute_ecommerce"]
 # Colecciones
 clientes_collection = db["clientes"]
 productos_collection = db["productos"]
+compras_collection = db["compras"]
+clientes_collection = db["clientes"]
