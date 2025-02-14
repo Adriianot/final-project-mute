@@ -61,11 +61,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Logout function
   const signOut = async () => {
     try {
-      await AsyncStorage.removeItem('token');
-      setIsAuthenticated(false);
-      console.log('Successful logout');
+      console.log("🔹 Cerrando sesión en AuthProvider...");
+  
+      await AsyncStorage.removeItem("token"); // Eliminar token
+      setIsAuthenticated(false); // Cambiar estado de autenticación
+  
+      console.log("✅ Cierre de sesión en AuthProvider exitoso.");
     } catch (error) {
-      console.error('Error logging out:', error);
+      console.error("❌ Error al cerrar sesión en AuthProvider:", error);
     }
   };
 

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
-import { useOAuth, useClerk } from '@clerk/clerk-expo'; // Importa useClerk para manejar sesiones
+import { useOAuth, useClerk, useAuth } from '@clerk/clerk-expo'; // Importa useClerk para manejar sesiones
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface ClerkContextProps {
@@ -47,13 +47,14 @@ export const ClerkAuthProvider: React.FC<ClerkAuthProviderProps> = ({ children }
   // Función para cerrar sesión
   const signOut = async () => {
     try {
-      // Limpia el token de AsyncStorage
-      await AsyncStorage.removeItem('token');
-      // Cierra la sesión con Clerk
-      await clerkSignOut();
-      console.log('Cierre de sesión exitoso');
+      console.log("🔹 Cerrando sesión en Clerk...");
+  
+      await AsyncStorage.removeItem("token"); // Asegurar que el token no quede guardado
+      await clerkSignOut(); // Cerrar sesión en Clerk
+  
+      console.log("✅ Sesión cerrada correctamente en Clerk.");
     } catch (err) {
-      console.error('Error al cerrar sesión:', err);
+      console.error("❌ Error al cerrar sesión en Clerk:", err);
     }
   };
 

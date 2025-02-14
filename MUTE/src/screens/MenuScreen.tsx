@@ -16,12 +16,17 @@ import * as ImagePicker from "expo-image-picker";
 import { useUser } from "@clerk/clerk-expo";
 import axios from "axios";
 import { useTheme } from "../contexts/ThemeContext";
+import { useAuth } from "../contexts/AuthContext"; // Importa AuthContext
+import { useClerkAuth } from "../contexts/ClerkContext";
 
 const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { isDarkMode, toggleDarkMode } = useTheme();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [profileImage, setProfileImage] = useState<string | null>(null);
+
+  const { signOut: authSignOut } = useAuth();
+  const { signOut: clerkSignOut } = useClerkAuth();
 
   const { isLoaded, isSignedIn, user: clerkUser } = useUser();
 
@@ -63,17 +68,21 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (isLoaded && isSignedIn) {
+      const token = await AsyncStorage.getItem("token");
+      if (!token && !isSignedIn) {
+        return;
+      }
+  
+      if (isSignedIn) {
         fetchUserFromClerk();
-      } else {
+      } else if (token) {
         await fetchUserFromDatabase();
       }
     };
-
+  
     fetchUserData();
   }, [isLoaded, isSignedIn]);
 
-  // Solicitar permisos para cámara y galería
   const requestPermissions = async () => {
     const { status: cameraStatus } =
       await ImagePicker.requestCameraPermissionsAsync();
@@ -138,17 +147,27 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         {
           text: "Aceptar",
           onPress: async () => {
-            try {
-              await AsyncStorage.removeItem("token");
-              navigation.navigate("Login");
-            } catch (error) {
-              console.error("Error logging out:", error);
-            }
+            logoutUser();
           },
         },
       ],
       { cancelable: true }
     );
+  };
+
+  const logoutUser = async () => {
+    try {
+      await AsyncStorage.removeItem("token");
+      if (authSignOut) {
+        await authSignOut();
+      }
+
+      if (clerkSignOut) {
+        await clerkSignOut();
+      }
+
+      navigation.navigate("Login");
+    } catch (error) {}
   };
 
   const dynamicStyles = getDynamicStyles(isDarkMode);

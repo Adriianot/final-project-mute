@@ -4,17 +4,17 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
   SafeAreaView,
   Image,
   Alert,
   ActivityIndicator,
 } from "react-native";
+import { styles } from "../styles/loginStyles";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { useAuth } from "../contexts/AuthContext";
 import { useClerkAuth } from "../contexts/ClerkContext";
-import SkeletonPlaceholder from '../components/SkeletonPlaceholder';
+import SkeletonPlaceholder from "../components/SkeletonPlaceholder";
 
 type LoginScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, "Login">;
@@ -27,7 +27,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const { signIn } = useAuth();
   const { signInWithGoogle } = useClerkAuth();
 
-  const handleSignIn =  async() => {
+  const handleSignIn = async () => {
     setIsSubmitting(true);
     try {
       await signIn(email, password);
@@ -37,12 +37,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     } finally {
       setIsSubmitting(false);
     }
-
   };
-
-  if (isSubmitting) {
-    return <SkeletonPlaceholder />;
-  }
 
   const handleNavigateToRegister = () => {
     navigation.navigate("Register");
@@ -52,28 +47,28 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     navigation.navigate("ForgotPassword");
   };
 
-  const handleSocialLogin = (provider: 'facebook' | 'google') => {
-    
-    console.log('Social login with:', provider);
-  };
-
   const handleGoogleSignIn = async () => {
+    setIsSubmitting(true);
     try {
       await signInWithGoogle();
-      Alert.alert("Success", "Google login successful");
-      navigation.navigate('Home')
+      navigation.navigate("Home");
     } catch (error: any) {
       Alert.alert("Error", error.message);
     }
   };
-  
+
+  if (isSubmitting) {
+    return <SkeletonPlaceholder />;
+  }
+
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         {/* Logo and tittle */}
         <View style={styles.logoContainer}>
           <Image
-            source={require('../../assets/mute-logo.png')} 
+            source={require("../../assets/mute-logo.png")}
             style={styles.logo}
             resizeMode="contain"
           />
@@ -103,7 +98,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             />
           </View>
 
-          <TouchableOpacity style={styles.loginButton} onPress={handleSignIn} disabled={isSubmitting}>
+          <TouchableOpacity
+            style={styles.loginButton}
+            onPress={handleSignIn}
+            disabled={isSubmitting}
+          >
             {isSubmitting ? (
               <ActivityIndicator color="#000" />
             ) : (
@@ -115,7 +114,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             style={styles.forgotPassword}
             onPress={handleForgotPassword}
           >
-            <Text style={styles.forgotPasswordText}>¿Forgot your password?</Text>
+            <Text style={styles.forgotPasswordText}>
+              ¿Forgot your password?
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -130,19 +131,10 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             <View style={styles.socialButtons}>
               <TouchableOpacity
                 style={styles.socialButton}
-                onPress={() => handleSocialLogin('facebook')}
-              >
-                <Image
-                  source={require('../../assets/facebook-icon.png')} 
-                  style={styles.socialIcon}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.socialButton}
                 onPress={handleGoogleSignIn}
               >
                 <Image
-                  source={require('../../assets/google-icon.png')} 
+                  source={require("../../assets/google-icon.png")}
                   style={styles.socialIcon}
                 />
               </TouchableOpacity>
@@ -153,94 +145,5 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-  },
-  logoContainer: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  logo: {
-    width: 100,
-    height: 100,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginTop: 10,
-  },
-  form: {
-    width: '100%',
-  },
-  inputContainer: {
-    marginBottom: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  input: {
-    height: 40,
-    paddingHorizontal: 10,
-  },
-  loginButton: {
-    backgroundColor: '#fff',
-    padding: 15,
-    borderRadius: 25,
-    alignItems: 'center',
-    marginTop: 20,
-    borderWidth: 0.5,
-  },
-  loginButtonText: {
-    color: '#000',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  forgotPassword: {
-    alignItems: 'center',
-    marginTop: 15,
-  },
-  forgotPasswordText: {
-    color: '#007bff',
-    fontSize: 14,
-  },
-  createAccount: {
-    backgroundColor: '#000',
-    padding: 15,
-    borderRadius: 25,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  createAccountText: {
-    color: '#fff',
-    fontSize: 16,
-  },
-  socialContainer: {
-    marginTop: 30,
-    alignItems: 'center',
-  },
-  socialText: {
-    color: '#666',
-    marginBottom: 15,
-  },
-  socialButtons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 20,
-  },
-  socialButton: {
-    padding: 10,
-  },
-  socialIcon: {
-    width: 30,
-    height: 30,
-  },
-});
 
 export default LoginScreen;

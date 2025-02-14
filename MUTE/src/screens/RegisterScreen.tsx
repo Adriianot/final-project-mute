@@ -113,30 +113,6 @@ const RegisterScreen: React.FC = () => {
         <TouchableOpacity style={styles.createButton} onPress={handleRegister}>
           <Text style={styles.createButtonText}>Crear</Text>
         </TouchableOpacity>
-
-        <View style={styles.socialContainer}>
-          <Text style={styles.socialText}>O inicia sesión con</Text>
-          <View style={styles.socialButtons}>
-            <TouchableOpacity
-              style={styles.socialButton}
-              onPress={() => handleSocialLogin('facebook')}
-            >
-              <Image
-                source={require('../../assets/facebook-icon.png')}
-                style={styles.socialIcon}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.socialButton}
-              onPress={() => handleSocialLogin('google')}
-            >
-              <Image
-                source={require('../../assets/google-icon.png')}
-                style={styles.socialIcon}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
       </View>
     </SafeAreaView>
   );
