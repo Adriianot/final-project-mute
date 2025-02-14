@@ -91,6 +91,7 @@ const styles = StyleSheet.create({
       width: 30,
       height: 30,
     },
+
   });
   
   

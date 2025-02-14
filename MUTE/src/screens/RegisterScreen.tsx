@@ -4,14 +4,22 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  StyleSheet,
   SafeAreaView,
   Image,
   Alert,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
 } from 'react-native';
 import axios from 'axios';
+import { styles } from "../styles/registerStyles";
+import { useNavigation, NavigationProp } from '@react-navigation/native';
+import { RootStackParamList } from '../navigation/AppNavigator';
+
+
 
 const RegisterScreen: React.FC = () => {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [nombre, setNombre] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -24,22 +32,22 @@ const RegisterScreen: React.FC = () => {
 
   const handleRegister = async () => {
     if (!nombre.trim()) {
-      Alert.alert('Error', 'El nombre completo es obligatorio.');
+      Alert.alert('Error', 'Full name is required.');
       return;
     }
 
     if (!validateEmail(email)) {
-      Alert.alert('Error', 'Por favor, ingresa un email válido.');
+      Alert.alert('Error', 'Please enter a valid email.');
       return;
     }
 
     if (password.length < 8) {
-      Alert.alert('Error', 'La contraseña debe tener al menos 8 caracteres.');
+      Alert.alert('Error', 'The password must be at least 8 characters long.');
       return;
     }
 
     if (password !== confirmPassword) {
-      Alert.alert('Error', 'Las contraseñas no coinciden.');
+      Alert.alert('Error', 'Passwords do not match.');
       return;
     }
 
@@ -49,33 +57,55 @@ const RegisterScreen: React.FC = () => {
         email,
         password,
       });
-
-      Alert.alert('Registro exitoso', 'Tu cuenta ha sido creada con éxito.');
-      console.log('Token recibido:', response.data.token);
+  
+      Alert.alert('Successful Registration', 'Your account has been successfully created.', [
+        {
+          text: 'OK',
+          onPress: () => {
+            // Clear the fields
+            setNombre('');
+            setEmail('');
+            setPassword('');
+            setConfirmPassword('');
+  
+            // Navigate to the login screen
+            navigation.navigate('Login');
+          },
+        },
+      ]);
+  
+      console.log('Token received:', response.data.token);
     } catch (error: any) {
-      console.error('Error al registrar:', error.response?.data?.detail || error.message);
-      Alert.alert('Error', error.response?.data?.detail || 'Hubo un problema con el registro.');
+      console.error('Registration error:', error.response?.data?.detail || error.message);
+      Alert.alert('Error', error.response?.data?.detail || 'There was a problem with the registration.');
     }
-  };
-
-  const handleSocialLogin = (provider: 'facebook' | 'google') => {
-    console.log('Social login with:', provider);
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      <Image
-        source={require('../../assets/mute-logo.png')}
-        style={styles.logo}
-        resizeMode="contain"
-      />
+
+<KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
+        <ScrollView 
+          contentContainerStyle={styles.scrollContainer} 
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+      <View style={styles.logoContainer}>
+                <Image
+                  source={require("../../assets/mute-logo.png")}
+                  style={styles.logo}
+                  resizeMode="contain"
+                />
+              </View>
       <View style={styles.content}>
-        <Text style={styles.title}>Crear Cuenta</Text>
-        <View style={styles.tableContainer}>
+        <Text style={styles.title}>Create Account</Text>
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
-              placeholder="Nombre completo"
+              placeholder="Full Name"
               value={nombre}
               onChangeText={setNombre}
             />
@@ -93,7 +123,7 @@ const RegisterScreen: React.FC = () => {
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
-              placeholder="Contraseña"
+              placeholder="Password"
               secureTextEntry
               value={password}
               onChangeText={setPassword}
@@ -102,101 +132,23 @@ const RegisterScreen: React.FC = () => {
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
-              placeholder="Confirmar Contraseña"
+              placeholder="Confirm Password"
               secureTextEntry
               value={confirmPassword}
               onChangeText={setConfirmPassword}
             />
           </View>
-        </View>
 
         <TouchableOpacity style={styles.createButton} onPress={handleRegister}>
-          <Text style={styles.createButtonText}>Crear</Text>
+          <Text style={styles.createButtonText}>Create</Text>
         </TouchableOpacity>
       </View>
+      </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    padding: 20,
-  },
-  logo: {
-    position: 'absolute',
-    top: 5,
-    left: 10,
-    width: 80,
-    height: 80,
-  
-  
-  },
-  content: {
-    flex: 1,
-    padding: 20,
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  tableContainer: {
-    backgroundColor: '#f9f9f9',
-    borderRadius: 8,
-    padding: 20,
-    marginBottom: 20,
-    elevation: 2,
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    backgroundColor: '#fff',
-    height: 40,
-    paddingHorizontal: 10,
-    fontSize: 16,
-    color: '#333',
-  },
-  createButton: {
-    backgroundColor: '#000',
-    paddingVertical: 10,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  createButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  socialContainer: {
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  socialText: {
-    color: '#666',
-    marginBottom: 15,
-  },
-  socialButtons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 20,
-  },
-  socialButton: {
-    padding: 10,
-  },
-  socialIcon: {
-    width: 30,
-    height: 30,
-  },
-});
+
 
 export default RegisterScreen;
