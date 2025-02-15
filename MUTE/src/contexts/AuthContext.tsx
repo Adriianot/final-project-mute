@@ -44,7 +44,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       // Store the token in AsyncStorage
       await AsyncStorage.setItem('token', token);
-
+      await AsyncStorage.setItem("user_email", email); 
       setIsAuthenticated(true);
       console.log('Login successful');
     } catch (error: any) {
@@ -64,6 +64,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log("🔹 Cerrando sesión en AuthProvider...");
   
       await AsyncStorage.removeItem("token"); // Eliminar token
+      await AsyncStorage.removeItem("user_email");
       setIsAuthenticated(false); // Cambiar estado de autenticación
   
       console.log("✅ Cierre de sesión en AuthProvider exitoso.");

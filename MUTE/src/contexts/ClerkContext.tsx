@@ -79,6 +79,7 @@ export const ClerkAuthProvider: React.FC<ClerkAuthProviderProps> = ({ children }
     try {
 
       await AsyncStorage.removeItem("token"); 
+      await AsyncStorage.removeItem("user_email");
       await clerkSignOut(); 
 
     } catch (err) {

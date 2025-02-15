@@ -157,17 +157,25 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
   const logoutUser = async () => {
     try {
+      console.log("🔹 Cerrando sesión...");
+  
+      // ✅ Eliminar email guardado en AsyncStorage
       await AsyncStorage.removeItem("token");
+      await AsyncStorage.removeItem("user_email"); 
+  
+      // ✅ Cerrar sesión en ambos sistemas (Firebase/Auth y Clerk)
       if (authSignOut) {
         await authSignOut();
       }
-
       if (clerkSignOut) {
         await clerkSignOut();
       }
-
-      navigation.navigate("Login");
-    } catch (error) {}
+  
+      console.log("✅ Sesión cerrada correctamente.");
+      navigation.navigate("Login"); // Redirigir a la pantalla de login
+    } catch (error) {
+      console.error("❌ Error al cerrar sesión:", error);
+    }
   };
 
   const dynamicStyles = getDynamicStyles(isDarkMode);
@@ -206,7 +214,7 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={dynamicStyles.menuItem}
-          onPress={() => console.log("Mis Compras")}
+          onPress={() => navigation.navigate("PurchasesScreen")}
         >
           <Icon
             name="favorite"

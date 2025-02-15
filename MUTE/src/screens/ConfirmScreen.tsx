@@ -13,6 +13,7 @@ import {
   Platform,
 } from "react-native";
 import { useTheme } from "../contexts/ThemeContext";
+import { useCart } from "../contexts/CartContext";
 import { useNavigation } from "@react-navigation/native";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../navigation/AppNavigator";
@@ -39,6 +40,7 @@ const ConfirmScreen: React.FC = () => {
   const navigation = useNavigation<ConfirmScreenNavigationProp>();
   const route = useRoute<ConfirmScreenRouteProp>();
   const { total, cartItems } = route.params;
+  const { clearCart } = useCart();
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccessVisible, setIsSuccessVisible] = useState(false);
@@ -237,6 +239,8 @@ const ConfirmScreen: React.FC = () => {
       if (response.ok) {
         setIsProcessing(false);
         setIsSuccessVisible(true);
+
+        clearCart();
 
         //Send notification after purchase confirmation
         await sendNotification(

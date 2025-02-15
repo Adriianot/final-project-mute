@@ -11,8 +11,7 @@ import CartScreen from '../screens/CartScreen';
 import ConfirmScreen from '../screens/ConfirmScreen';
 import ProductDetailScreen from '../screens/ProductDetailScreen';
 import ChatAssistantScreen from '../screens/ChatAssistantScreen'; 
-
-
+import PurchasesScreen from '../screens/PurchasesScreen'; 
 
 export type RootStackParamList = {
   Login: undefined;
@@ -24,6 +23,8 @@ export type RootStackParamList = {
   ConfirmScreen: { total: number; cartItems: any[] };
   ProductDetail: { product: Product };
   ChatAssistantScreen: undefined; 
+  PurchasesScreen: undefined;
+
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -50,6 +51,7 @@ const AppNavigator: React.FC = () => {
       <Stack.Screen name="ConfirmScreen" component={ConfirmScreen} options={{ title: 'Confirm Order'  }} />
       <Stack.Screen name="ProductDetail" component={ProductDetailScreen} options={{ title: 'Product Details' }} />
       <Stack.Screen name="ChatAssistantScreen" component={ChatAssistantScreen} options={{ title: 'Virtual Assistant' }} />
+      <Stack.Screen name="PurchasesScreen" component={PurchasesScreen} options={{ title: 'My Purchases' }} />
     </Stack.Navigator>
   );
 };

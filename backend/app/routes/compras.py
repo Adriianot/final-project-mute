@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from app.database import compras_collection, clientes_collection
 from app.models import Compra
 
@@ -27,5 +27,22 @@ async def registrar_compra(compra: Compra):
         compras_collection.insert_one(compra_dict)
 
         return {"message": "Compra registrada con éxito"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/purchase")
+async def obtener_compras(email: str = Query(..., description="Email del cliente")):
+    try:
+        # ✅ Filtrar compras solo del usuario que hace la solicitud
+        compras = list(compras_collection.find({"cliente_email": email}, {"_id": 1, "total": 1, "productos": 1}))
+
+        if not compras:
+            raise HTTPException(status_code=404, detail="No se encontraron compras para este usuario")
+
+        # ✅ Convertir ObjectId a string antes de devolver
+        for compra in compras:
+            compra["_id"] = str(compra["_id"])
+
+        return compras
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
