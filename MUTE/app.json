@@ -34,7 +34,15 @@
     },
     "scheme": "mute",
     "plugins": [
-    "expo-secure-store"
-    ]
+  "expo-secure-store",
+  [
+    "expo-notifications",
+    {
+      "icon": "./assets/notification-icon.png",
+      "color": "#ffffff",
+      "sounds": ["./assets/notification.wav"]
+    }
+  ]
+]
   }
 }

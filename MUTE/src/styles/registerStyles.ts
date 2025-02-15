@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
     },
     logoContainer: {
       alignItems: "center",
-      marginTop: windowHeight * 0.03, // Mejor ajuste del logo
+      marginTop: windowHeight * 0.03, 
       marginBottom: 10,
     },
     logo: {
@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
       marginBottom: 20,
     },
     inputContainer: {
-      width: "90%", // Ajusta el tamaño para que no se vea tan ancho
+      width: "90%",
       marginBottom: 15,
       borderBottomWidth: 1,
       borderBottomColor: "#ccc",
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
       borderRadius: 25,
       alignItems: "center",
       marginTop: 30,
-      width: "85%", // Botón con ancho ajustado
+      width: "85%",
     },
     createButtonText: {
       color: "#fff",

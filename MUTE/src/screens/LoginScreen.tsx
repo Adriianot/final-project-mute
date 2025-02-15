@@ -31,9 +31,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
     setIsSubmitting(true);
     try {
       await signIn(email, password);
+      console.log("✅ Usuario inició sesión con Google y fue sincronizado en el backend.");
       navigation.navigate("Home");
     } catch (error: any) {
       Alert.alert("Login Error", error.message);
+      console.error("❌ Error en Google Sign-In:", error);
     } finally {
       setIsSubmitting(false);
     }

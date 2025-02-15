@@ -1,7 +1,7 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
-import { useOAuth, useClerk, useAuth } from '@clerk/clerk-expo'; // Importa useClerk para manejar sesiones
+import { useOAuth, useClerk, useUser  } from '@clerk/clerk-expo'; // Importa useClerk para manejar sesiones
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface ClerkContextProps {
@@ -21,40 +21,68 @@ export const ClerkAuthProvider: React.FC<ClerkAuthProviderProps> = ({ children }
   const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' });
   const { session, signOut: clerkSignOut } = useClerk();
 
-  // Función para iniciar sesión con Google
   const signInWithGoogle = async () => {
     try {
-      // Si ya hay una sesión activa, cierra la sesión primero
-      if (session) {
-        await signOut();
-      }
+      console.log("🔹 Iniciando Google Login...");
 
-      const redirectUrl = Linking.createURL('/oauth-native');
+      const redirectUrl = Linking.createURL("/oauth-native");
       const { createdSessionId, setActive } = await startOAuthFlow({ redirectUrl });
 
       if (createdSessionId) {
         await setActive!({ session: createdSessionId });
-        await AsyncStorage.setItem('token', createdSessionId);
-        console.log('Google login successful');
+
+        // ✅ Obtener el usuario desde Clerk
+        const user = session?.user;
+        if (!user) {
+          console.error("❌ No se pudo obtener el usuario de Clerk.");
+          return;
+        }
+
+        console.log("✅ Usuario de Clerk obtenido:", user);
+
+        // 🔹 Guardar el token localmente
+        const token = await session?.getToken();
+        if (token) {
+          await AsyncStorage.setItem("token", token);
+        }
+
+        // 🔹 Sincronizar usuario con el backend
+        await syncUserWithBackend(user);
       } else {
-        console.error('Failed to get Clerk session');
+        console.error("❌ No se pudo obtener la sesión de Clerk.");
       }
     } catch (err) {
-      console.error('Error logging in with Google:', JSON.stringify(err, null, 2));
+      console.error("❌ Error al iniciar sesión con Google:", err);
     }
   };
 
-  // Función para cerrar sesión
+  const syncUserWithBackend = async (user: any) => {
+    try {
+      const response = await fetch("http://192.168.100.128:8000/auth/clerk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: user.id,
+          email: user.primaryEmailAddress?.emailAddress,
+          nombre: user.fullName,
+        }),
+      });
+
+      const result = await response.json();
+      console.log("✅ Usuario sincronizado con el backend:", result);
+    } catch (error) {
+      console.error("❌ Error al sincronizar usuario con el backend:", error);
+    }
+  };
+
   const signOut = async () => {
     try {
-      console.log("🔹 Cerrando sesión en Clerk...");
-  
-      await AsyncStorage.removeItem("token"); // Asegurar que el token no quede guardado
-      await clerkSignOut(); // Cerrar sesión en Clerk
-  
-      console.log("✅ Sesión cerrada correctamente en Clerk.");
+
+      await AsyncStorage.removeItem("token"); 
+      await clerkSignOut(); 
+
     } catch (err) {
-      console.error("❌ Error al cerrar sesión en Clerk:", err);
+
     }
   };
 

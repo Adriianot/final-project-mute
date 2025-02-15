@@ -12,7 +12,7 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import { StackNavigationProp } from "@react-navigation/stack";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { getDynamicStyles } from "../styles/cartStyles";
-import { useCart } from "../contexts/CartContext"; // Importamos el contexto del carrito
+import { useCart } from "../contexts/CartContext"; 
 
 type CartScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
@@ -24,7 +24,7 @@ const CartScreen: React.FC = () => {
   const dynamicStyles = getDynamicStyles(isDarkMode);
   const navigation = useNavigation<CartScreenNavigationProp>();
 
-  const { cartItems, updateQuantity, removeFromCart } = useCart(); // Usamos el contexto del carrito
+  const { cartItems, updateQuantity, removeFromCart } = useCart();
 
   const calculateTotal = () =>
     cartItems.reduce((total, item) => total + item.precio * item.cantidad, 0);

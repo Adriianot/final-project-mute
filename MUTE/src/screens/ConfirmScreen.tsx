@@ -22,7 +22,10 @@ import { CreditCardInput } from "react-native-credit-card-input";
 import MapView, { Marker, MapPressEvent, Region } from "react-native-maps";
 import * as Location from "expo-location";
 import { getDynamicStyles } from "../styles/confirmStyles";
-import { registerForPushNotifications, sendNotification } from "../utils/notifications";
+import {
+  registerForPushNotifications,
+  sendNotification,
+} from "../utils/notifications";
 
 type ConfirmScreenRouteProp = RouteProp<RootStackParamList, "ConfirmScreen">;
 type ConfirmScreenNavigationProp = StackNavigationProp<
@@ -59,8 +62,31 @@ const ConfirmScreen: React.FC = () => {
   const [address, setAddress] = useState<string>("");
 
   useEffect(() => {
+    async function setupNotifications() {
+      const token = await registerForPushNotifications();
+      console.log("Expo Push Token registrado:", token);
+    }
+
     getCurrentLocation();
+    setupNotifications();
+
+    setTimeout(() => {
+      sendNotification("🔔 Take advantage of discounts in our store", "MUTE");
+    }, 6000);
   }, []);
+
+  useEffect(() => {
+    async function handleSuccessNotification() {
+      if (isSuccessVisible) {
+        await sendNotification(
+          "Confirmed purchase ✅",
+          `Your purchase of $${total.toFixed(2)} has been confirmed.`,
+          { total, productos: cartItems }
+        );
+      }
+    }
+    handleSuccessNotification();
+  }, [isSuccessVisible]);
 
   const getCurrentLocation = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
@@ -97,7 +123,10 @@ const ConfirmScreen: React.FC = () => {
     setAddress(formattedAddress);
   };
 
-  const getAddressFromCoordinates = async (latitude: number, longitude: number) => {
+  const getAddressFromCoordinates = async (
+    latitude: number,
+    longitude: number
+  ) => {
     try {
       const apiKey = "AIzaSyDntnxd8PrzjTg1-ywyH8nN6SaOwSupP5I";
       const response = await fetch(
@@ -116,7 +145,7 @@ const ConfirmScreen: React.FC = () => {
     }
   };
 
-  const handleMapPress = async  (event: MapPressEvent) => {
+  const handleMapPress = async (event: MapPressEvent) => {
     const { coordinate } = event.nativeEvent;
     setLocation({
       latitude: coordinate.latitude,
@@ -147,46 +176,49 @@ const ConfirmScreen: React.FC = () => {
     setAddress(formattedAddress);
   };
 
-  // Validaciones antes de confirmar la compra
+  // Validations before confirming the purchase
   const isValidEmail = (email: string) =>
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const isValidPhone = (phone: string) => phone.length >= 10; // Verificar longitud mínima
+  const isValidPhone = (phone: string) => phone.length >= 10;
   const isValidCreditCard = (card: any) =>
     card?.number && card?.expiry && card?.cvc;
 
   const handleConfirm = async () => {
-    if (!name || !email || !phone || !creditCard.number || !location || !address) {
-      Alert.alert("Error", "Por favor, completa todos los campos.");
+    if (
+      !name ||
+      !email ||
+      !phone ||
+      !creditCard.number ||
+      !location ||
+      !address
+    ) {
+      Alert.alert("Error", "Please complete all fields.");
       return;
     }
 
     if (!isValidEmail(email)) {
-      Alert.alert("Error", "Correo electrónico inválido.");
+      Alert.alert("Error", "Invalid email.");
       return;
     }
 
     if (!isValidPhone(phone)) {
-      Alert.alert("Error", "Número de teléfono inválido.");
+      Alert.alert("Error", "Invalid phone number.");
       return;
     }
 
     if (!isValidCreditCard(creditCard)) {
-      Alert.alert("Error", "Tarjeta de crédito inválida.");
+      Alert.alert("Error", "Invalid credit card.");
       return;
     }
 
     setIsProcessing(true);
-    setTimeout(() => {
-      setIsProcessing(false);
-      setIsSuccessVisible(true);
-    }, 2000);
 
     const compraData = {
       cliente_email: email,
       total: total,
-      productos: route.params.cartItems, // Asegúrate de pasar los productos desde el carrito
+      productos: route.params.cartItems,
       telefono: phone,
-      direccion: address, // ✅ Usamos la dirección real obtenida de Google Maps
+      direccion: address,
       ubicacion: location,
       metodo_pago: "Tarjeta de Crédito",
     };
@@ -205,18 +237,29 @@ const ConfirmScreen: React.FC = () => {
       if (response.ok) {
         setIsProcessing(false);
         setIsSuccessVisible(true);
+
+        //Send notification after purchase confirmation
+        await sendNotification(
+          "🛒 Registered Purchase",
+          `Your purchase of  $${total.toFixed(2)} has been successfully registered.`,
+          { total, productos: cartItems }
+        );
       } else {
         setIsProcessing(false);
-        Alert.alert("Error", result.detail || "No se pudo registrar la compra");
+        Alert.alert(
+          "Error",
+          result.detail || "The purchase could not be registered"
+        );
       }
     } catch (error) {
       setIsProcessing(false);
-      Alert.alert("Error", "Ocurrió un problema al registrar la compra");
+      Alert.alert("Error", "A problem occurred while registering the purchase");
     }
   };
+
   const handleReturnHome = () => {
     setIsSuccessVisible(false);
-    navigation.navigate("Home"); // ✅ Redirige al usuario a Home después de confirmar
+    navigation.navigate("Home");
   };
 
   return (
@@ -228,7 +271,7 @@ const ConfirmScreen: React.FC = () => {
         contentContainerStyle={dynamicStyles.scrollContainer}
         showsVerticalScrollIndicator={false}
       >
-        <Text style={dynamicStyles.title}>Confirmación de Envío</Text>
+        <Text style={dynamicStyles.title}>Shipping Confirmation</Text>
 
         <TextInput
           style={dynamicStyles.input}
@@ -257,7 +300,7 @@ const ConfirmScreen: React.FC = () => {
           onChangePhoneNumber={(number) => setPhone(number)}
         />
 
-        <Text style={dynamicStyles.sectionTitle}>Ubicación:</Text>
+        <Text style={dynamicStyles.sectionTitle}>Location:</Text>
         {location ? (
           <>
             <MapView
@@ -271,10 +314,10 @@ const ConfirmScreen: React.FC = () => {
             </MapView>
           </>
         ) : (
-          <Text style={dynamicStyles.errorText}>Obteniendo ubicación...</Text>
+          <Text style={dynamicStyles.errorText}>Getting location...</Text>
         )}
 
-        <Text style={dynamicStyles.sectionTitle}>Tarjeta de Crédito:</Text>
+        <Text style={dynamicStyles.sectionTitle}>Credit card:</Text>
         <CreditCardInput
           inputStyle={{ color: isDarkMode ? "#ffffff" : "#000000" }}
           labelStyle={{ color: isDarkMode ? "#ffffff" : "#000000" }}
@@ -299,19 +342,19 @@ const ConfirmScreen: React.FC = () => {
         {/* Modal de Procesamiento */}
         <Modal visible={isProcessing} transparent animationType="fade">
           <View style={dynamicStyles.modalContainer}>
-          <Image
+            <Image
               source={require("../../assets/mute2-logo.png")}
               style={dynamicStyles.modalLogo}
             />
             <ActivityIndicator size="large" color="#0070BA" />
-            <Text style={dynamicStyles.loadingText}>Procesando...</Text>
+            <Text style={dynamicStyles.loadingText}>Processing...</Text>
           </View>
         </Modal>
 
         {/* Modal de Pago Exitoso */}
         <Modal visible={isSuccessVisible} animationType="slide">
           <View style={dynamicStyles.fullScreenModal}>
-            <Text style={dynamicStyles.paidText}>PAGADO CON ÉXITO</Text>
+            <Text style={dynamicStyles.paidText}>PAID SUCCESSFULLY</Text>
             <Image
               source={require("../../assets/paypal-logo.png")}
               style={dynamicStyles.modalLogo}
@@ -323,7 +366,7 @@ const ConfirmScreen: React.FC = () => {
               style={dynamicStyles.confirmButton}
             >
               <Text style={dynamicStyles.confirmButtonText}>
-                Volver a Inicio
+                Return to Home
               </Text>
             </TouchableOpacity>
           </View>
