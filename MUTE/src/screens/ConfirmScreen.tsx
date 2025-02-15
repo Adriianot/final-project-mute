@@ -22,6 +22,7 @@ import { CreditCardInput } from "react-native-credit-card-input";
 import MapView, { Marker, MapPressEvent, Region } from "react-native-maps";
 import * as Location from "expo-location";
 import { getDynamicStyles } from "../styles/confirmStyles";
+import { registerForPushNotifications, sendNotification } from "../utils/notifications";
 
 type ConfirmScreenRouteProp = RouteProp<RootStackParamList, "ConfirmScreen">;
 type ConfirmScreenNavigationProp = StackNavigationProp<
@@ -98,7 +99,7 @@ const ConfirmScreen: React.FC = () => {
 
   const getAddressFromCoordinates = async (latitude: number, longitude: number) => {
     try {
-      const apiKey = "AIzaSyDntnxd8PrzjTg1-ywyH8nN6SaOwSupP5I"; // Reemplázala con tu API Key
+      const apiKey = "AIzaSyDntnxd8PrzjTg1-ywyH8nN6SaOwSupP5I";
       const response = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`
       );
