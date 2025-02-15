@@ -15,6 +15,7 @@ import {
 import { useTheme } from "../contexts/ThemeContext";
 import { useCart } from "../contexts/CartContext";
 import { useNavigation } from "@react-navigation/native";
+import { useUser } from "@clerk/clerk-expo";
 import { useRoute, RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../navigation/AppNavigator";
 import { StackNavigationProp } from "@react-navigation/stack";
@@ -22,6 +23,7 @@ import PhoneInput from "react-native-phone-input";
 import { CreditCardInput } from "react-native-credit-card-input";
 import MapView, { Marker, MapPressEvent, Region } from "react-native-maps";
 import * as Location from "expo-location";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getDynamicStyles } from "../styles/confirmStyles";
 import {
   registerForPushNotifications,
@@ -41,11 +43,13 @@ const ConfirmScreen: React.FC = () => {
   const route = useRoute<ConfirmScreenRouteProp>();
   const { total, cartItems } = route.params;
   const { clearCart } = useCart();
+  const { isLoaded, isSignedIn, user: clerkUser } = useUser();
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccessVisible, setIsSuccessVisible] = useState(false);
   const mapRef = useRef<MapView>(null);
   const [mapKey, setMapKey] = useState(0);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
 
   // Campos del formulario
   const [name, setName] = useState("");
@@ -89,6 +93,38 @@ const ConfirmScreen: React.FC = () => {
     }
     handleSuccessNotification();
   }, [isSuccessVisible]);
+
+  useEffect(() => {
+    const fetchUserEmail = async () => {
+      try {
+        let email = null;
+
+        // 🔹 Intentar obtener el email de Clerk si el usuario está autenticado
+        if (isLoaded && isSignedIn && clerkUser) {
+          email = clerkUser.emailAddresses[0]?.emailAddress || null;
+        }
+
+        // 🔹 Si no está en Clerk, buscar en AsyncStorage
+        if (!email) {
+          const storedEmail = await AsyncStorage.getItem("user_email");
+          if (storedEmail) {
+            email = storedEmail;
+          }
+        }
+
+        if (!email) {
+          console.error("❌ No se pudo obtener el email del usuario.");
+        } else {
+          console.log("✅ Email del usuario autenticado:", email);
+          setUserEmail(email);
+        }
+      } catch (error) {
+        console.error("❌ Error obteniendo el email:", error);
+      }
+    };
+
+    fetchUserEmail();
+  }, [isLoaded, isSignedIn]);
 
   const getCurrentLocation = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
@@ -186,20 +222,19 @@ const ConfirmScreen: React.FC = () => {
     card?.number && card?.expiry && card?.cvc;
 
   const handleConfirm = async () => {
+    if (!userEmail) {
+      Alert.alert("Error", "No se pudo obtener el email del usuario.");
+      return;
+    }
+    
     if (
       !name ||
-      !email ||
       !phone ||
       !creditCard.number ||
       !location ||
       !address
     ) {
       Alert.alert("Error", "Please complete all fields.");
-      return;
-    }
-
-    if (!isValidEmail(email)) {
-      Alert.alert("Error", "Invalid email.");
       return;
     }
 
@@ -216,7 +251,7 @@ const ConfirmScreen: React.FC = () => {
     setIsProcessing(true);
 
     const compraData = {
-      cliente_email: email,
+      cliente_email: userEmail,
       total: total,
       productos: route.params.cartItems,
       telefono: phone,
@@ -289,8 +324,8 @@ const ConfirmScreen: React.FC = () => {
           placeholder="Correo Electrónico"
           placeholderTextColor="#999"
           keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
+          value={userEmail|| ""}
+          editable={false} 
         />
 
         <PhoneInput
