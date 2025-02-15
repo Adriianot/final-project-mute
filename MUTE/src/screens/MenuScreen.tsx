@@ -18,13 +18,15 @@ import axios from "axios";
 import { useTheme } from "../contexts/ThemeContext";
 import { useAuth } from "../contexts/AuthContext"; // Importa AuthContext
 import { useClerkAuth } from "../contexts/ClerkContext";
+import { useCart } from "../contexts/CartContext";
 
 const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { isDarkMode, toggleDarkMode } = useTheme();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [profileImage, setProfileImage] = useState<string | null>(null);
-
+  const { clearCart } = useCart();
+  
   const { signOut: authSignOut } = useAuth();
   const { signOut: clerkSignOut } = useClerkAuth();
 
@@ -158,23 +160,19 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const logoutUser = async () => {
     try {
       console.log("🔹 Cerrando sesión...");
-  
-      // ✅ Eliminar email guardado en AsyncStorage
+
       await AsyncStorage.removeItem("token");
       await AsyncStorage.removeItem("user_email"); 
-  
-      // ✅ Cerrar sesión en ambos sistemas (Firebase/Auth y Clerk)
+
       if (authSignOut) {
         await authSignOut();
       }
       if (clerkSignOut) {
         await clerkSignOut();
       }
-  
-      console.log("✅ Sesión cerrada correctamente.");
-      navigation.navigate("Login"); // Redirigir a la pantalla de login
+      clearCart();
+      navigation.navigate("Login"); 
     } catch (error) {
-      console.error("❌ Error al cerrar sesión:", error);
     }
   };
 
