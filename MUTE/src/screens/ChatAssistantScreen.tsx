@@ -87,7 +87,11 @@ const ChatAssistantScreen: React.FC<ChatAssistantScreenProps> = ({
     if (await isSpeakingAsync()) {
       stop();
     } else {
-      speak(text);
+      speak(text,{
+        language: "es-MX",
+        pitch: 1.0,
+        rate: 1.0,
+      });
     }
   };
 

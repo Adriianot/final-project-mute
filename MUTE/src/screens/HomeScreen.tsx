@@ -41,8 +41,6 @@ interface Product {
 }
 
 // Constants
-const { width: windowWidth } = Dimensions.get("window");
-
 const BANNER_ITEMS: { id: string; image: any }[] = [
   { id: "1", image: require("../../assets/banner1.jpg") },
   { id: "2", image: require("../../assets/banner2.jpg") },
@@ -138,6 +136,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   //  `useDebounce` 300ms
   const debouncedSearch = useDebounce(searchText, 300);
 
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const viewPagerRef = useRef<ViewPager>(null);
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -161,7 +162,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 
     fetchProducts();
   }, []);
-// desde aquí
 useEffect(() => {
   let filtered = products;
 
@@ -183,6 +183,15 @@ useEffect(() => {
 
   setFilteredProducts(filtered);
 }, [debouncedSearch, products, selectedCategory]);
+
+useEffect(() => {
+  const interval = setInterval(() => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % BANNER_ITEMS.length);
+    viewPagerRef.current?.setPage((currentIndex + 1) % BANNER_ITEMS.length);
+  }, 3000);
+
+  return () => clearInterval(interval);
+}, [currentIndex]);
 
   const handleProductPress = (product: Product) => {
     console.log("Producto seleccionado antes de navegar:", product);
@@ -212,8 +221,12 @@ useEffect(() => {
         style={dynamicStyles.scrollView}
       >
         {/* Banners with auto-slide */}
-        <ViewPager style={dynamicStyles.viewPager} initialPage={0}>
-          {BANNER_ITEMS.map((item) => (
+        <ViewPager
+          ref={viewPagerRef}
+          style={dynamicStyles.viewPager}
+          initialPage={0}
+        >
+          {BANNER_ITEMS.map((item, index) => (
             <View key={item.id} style={dynamicStyles.bannerPage}>
               <Image
                 source={item.image}

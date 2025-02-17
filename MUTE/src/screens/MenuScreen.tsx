@@ -16,7 +16,7 @@ import * as ImagePicker from "expo-image-picker";
 import { useUser } from "@clerk/clerk-expo";
 import axios from "axios";
 import { useTheme } from "../contexts/ThemeContext";
-import { useAuth } from "../contexts/AuthContext"; // Importa AuthContext
+import { useAuth } from "../contexts/AuthContext";
 import { useClerkAuth } from "../contexts/ClerkContext";
 import { useCart } from "../contexts/CartContext";
 
@@ -26,7 +26,7 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const { clearCart } = useCart();
-  
+
   const { signOut: authSignOut } = useAuth();
   const { signOut: clerkSignOut } = useClerkAuth();
 
@@ -74,16 +74,32 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       if (!token && !isSignedIn) {
         return;
       }
-  
+
       if (isSignedIn) {
         fetchUserFromClerk();
       } else if (token) {
         await fetchUserFromDatabase();
       }
     };
-  
+
     fetchUserData();
   }, [isLoaded, isSignedIn]);
+
+  useEffect(() => {
+    const loadProfileImage = async () => {
+      try {
+        const savedImage = await AsyncStorage.getItem("profile_image");
+        if (savedImage) {
+          setProfileImage(savedImage);
+        }
+      } catch (error) {
+        console.error("Error al cargar la imagen de perfil:", error);
+      }
+    };
+
+    loadProfileImage();
+  }, [navigation]);
+
 
   const requestPermissions = async () => {
     const { status: cameraStatus } =
@@ -118,6 +134,7 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
           if (!result.canceled) {
             setProfileImage(result.assets[0].uri);
+            await AsyncStorage.setItem("profile_image", result.assets[0].uri);
           }
         },
       },
@@ -133,6 +150,7 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
 
           if (!result.canceled) {
             setProfileImage(result.assets[0].uri);
+            await AsyncStorage.setItem("profile_image", result.assets[0].uri);
           }
         },
       },
@@ -162,7 +180,7 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       console.log("🔹 Cerrando sesión...");
 
       await AsyncStorage.removeItem("token");
-      await AsyncStorage.removeItem("user_email"); 
+      await AsyncStorage.removeItem("user_email");
 
       if (authSignOut) {
         await authSignOut();
@@ -171,9 +189,8 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
         await clerkSignOut();
       }
       clearCart();
-      navigation.navigate("Login"); 
-    } catch (error) {
-    }
+      navigation.navigate("Login");
+    } catch (error) {}
   };
 
   const dynamicStyles = getDynamicStyles(isDarkMode);

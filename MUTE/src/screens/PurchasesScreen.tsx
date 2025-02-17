@@ -40,12 +40,10 @@ const PurchasesScreen: React.FC = () => {
       }
 
       setUserEmail(email);
-      await AsyncStorage.setItem("user_email", email); // 🔹 Forzar actualización del email
-      console.log("✅ Email obtenido y actualizado:", email);
+      await AsyncStorage.setItem("user_email", email); 
 
       fetchPurchases(email);
     } catch (error) {
-      console.error("❌ Error obteniendo el email:", error);
       setLoading(false);
     }
   };
@@ -56,9 +54,7 @@ const PurchasesScreen: React.FC = () => {
           `http://192.168.100.128:8000/auth/purchase?email=${email}`
         );
         setPurchases(response.data);
-        console.log("✅ Compras obtenidas:", response.data);
       } catch (error) {
-        console.error("❌ Error al obtener las compras:", error);
       } finally {
         setLoading(false);
       }
@@ -76,18 +72,11 @@ const PurchasesScreen: React.FC = () => {
       productos: { id: string; nombre: string; imagen: string; precio: number; cantidad: number; talla: string }[];
     };
   }) => (
-    <View style={dynamicStyles.cartItem}>
-      <Text style={dynamicStyles.itemName}>
-        Compra ID: {item.id ? item.id : "Sin ID"}
-      </Text>
-      <Text style={dynamicStyles.itemPrice}>
-        Total: ${item.total.toFixed(2)}
-      </Text>
+    <View style={dynamicStyles.cartItemContainer}>      
 
-      {/* ✅ Mostrar productos comprados */}
       {item.productos?.length > 0 ? (
         item.productos.map((producto, index) => (
-          <View key={producto.id || index.toString()} style={dynamicStyles.cartItem}>
+          <View key={producto.id || index.toString()} style={dynamicStyles.productContainer}>
             <Image source={{ uri: producto.imagen }} style={dynamicStyles.cartImage} />
             <View style={dynamicStyles.cartDetails}>
               <Text style={dynamicStyles.itemName}>{producto.nombre}</Text>
@@ -95,11 +84,14 @@ const PurchasesScreen: React.FC = () => {
               <Text style={dynamicStyles.itemPrice}>Cantidad: {producto.cantidad}</Text>
               <Text style={dynamicStyles.itemPrice}>${producto.precio.toFixed(2)}</Text>
             </View>
+            
           </View>
         ))
       ) : (
         <Text style={dynamicStyles.itemPrice}>No hay productos en esta compra</Text>
+        
       )}
+      <Text style={dynamicStyles.itemPrice}>Total: ${item.total.toFixed(2)}</Text>
     </View>
   );
 

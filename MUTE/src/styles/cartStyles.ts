@@ -84,6 +84,28 @@ const getDynamicStyles = (isDarkMode: boolean) =>
         alignItems: "center",
       },
       confirmButtonText: { fontSize: 16, color: "#ffffff", fontWeight: "bold" },
+      cartItemContainer: {
+        width: "100%",
+        padding: 16,
+        borderRadius: 10,
+        backgroundColor: isDarkMode ? "#1e1e1e" : "#ffffff",
+        marginBottom: 16,
+        shadowColor: "#000",
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+        elevation: 3,
+      },
+      
+      productContainer: {
+        flexDirection: "row", 
+        alignItems: "center",
+        width: "100%", 
+        backgroundColor: isDarkMode ? "#1e1e1e" : "#f9f9f9",
+        padding: 10,
+        borderRadius: 8,
+        marginBottom: 5,
+      },
+      
     });
   
 export { getDynamicStyles };

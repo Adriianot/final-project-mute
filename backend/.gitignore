@@ -6,7 +6,9 @@ venv/
 *.pyc 
 __pycache__/
 *.exe
-
+.dockerignore
+Docker
+Dockerfile
 # Expo
 .expo/
 dist/

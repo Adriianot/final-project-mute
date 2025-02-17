@@ -34,7 +34,6 @@ export const ClerkAuthProvider: React.FC<ClerkAuthProviderProps> = ({ children }
         // ✅ Obtener el usuario desde Clerk
         const user = session?.user;
         if (!user) {
-          console.error("❌ No se pudo obtener el usuario de Clerk.");
           return;
         }
 
@@ -49,7 +48,6 @@ export const ClerkAuthProvider: React.FC<ClerkAuthProviderProps> = ({ children }
         // 🔹 Sincronizar usuario con el backend
         await syncUserWithBackend(user);
       } else {
-        console.error("❌ No se pudo obtener la sesión de Clerk.");
       }
     } catch (err) {
       console.error("❌ Error al iniciar sesión con Google:", err);
