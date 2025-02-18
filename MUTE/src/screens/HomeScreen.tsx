@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef, useCallback, memo } from "react";
 import {
   View,
   Text,
@@ -127,6 +127,20 @@ const Header: React.FC<{
   );
 };
 
+const ProductItem = memo(({ item, onPress, dynamicStyles }: { item: Product; onPress: () => void; dynamicStyles: any }) => {
+  return (
+    <TouchableOpacity
+      style={[dynamicStyles.productCard, { flex: 1, margin: 5 }]}
+      onPress={onPress}
+    >
+      <Image source={{ uri: item.imagen }} style={dynamicStyles.productImage} resizeMode="cover" />
+      <Text style={dynamicStyles.productTitle}>{item.nombre}</Text>
+      <Text style={dynamicStyles.productPrice}>${item.precio.toFixed(2)}</Text>
+    </TouchableOpacity>
+  );
+});
+
+
 const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const { isDarkMode } = useTheme();
   const dynamicStyles = getDynamicStyles(isDarkMode);
@@ -142,7 +156,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const viewPagerRef = useRef<ViewPager>(null);
   const [page, setPage] = useState(1);
-  const perPage = 10; // Número de productos por página
+  const perPage = 10;
   const [hasMore, setHasMore] = useState(true);
 
   const shuffleArray = (array: Product[]) => {
@@ -182,10 +196,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           return;
         }
 
-        const productsWithTallas = data.map((product: Product) => ({
+        let productsWithTallas = data.map((product: Product) => ({
           ...product,
           tallas: Array.isArray(product.tallas) ? product.tallas : [],
         }));
+
+        productsWithTallas = shuffleArray(productsWithTallas);
 
         setProducts((prevProducts) =>
           append ? [...prevProducts, ...productsWithTallas] : productsWithTallas
@@ -273,6 +289,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
     }
   }, [loadingMore, hasMore, page]);
 
+  const renderProductItem = useCallback(
+    ({ item }: { item: Product }) => <ProductItem item={item} onPress={() => handleProductPress(item)} dynamicStyles={dynamicStyles} />,
+    [handleProductPress]
+  );
+
   return (
     <SafeAreaView style={dynamicStyles.container}>
       <StatusBar
@@ -284,14 +305,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         keyExtractor={(item, index) =>
           item.id ? item.id.toString() : `product-${index}`
         }
-        numColumns={2} // Mantiene el diseño de cuadrícula
+        numColumns={2} 
         columnWrapperStyle={{
           justifyContent: "space-between",
-          paddingHorizontal: 10,
-        }} // Asegura buen espaciado
-        contentContainerStyle={{ paddingBottom: 20 }} // Da margen inferior
+          paddingHorizontal: 8,
+        }}
+        renderItem={renderProductItem} 
+        contentContainerStyle={{ paddingBottom: 10 }} 
         ListHeaderComponent={
-          // Aquí se coloca el contenido que se perdió
           <>
             <Header
               onMenuPress={() => navigation.navigate("Menu")}
@@ -355,30 +376,15 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
             </View>
           </>
         }
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={[
-              dynamicStyles.productCard,
-              { flex: 1, margin: 5 }, // Espaciado uniforme
-            ]}
-            onPress={() => handleProductPress(item)}
-          >
-            <Image
-              source={{ uri: item.imagen }}
-              style={dynamicStyles.productImage}
-              resizeMode="cover"
-            />
-            <Text style={dynamicStyles.productTitle}>{item.nombre}</Text>
-            <Text style={dynamicStyles.productPrice}>
-              ${item.precio.toFixed(2)}
-            </Text>
-          </TouchableOpacity>
-        )}
-        onEndReached={hasMore ? loadMoreProducts : null} // Paginación funcional
+
+        onEndReached={hasMore ? loadMoreProducts : null} 
         onEndReachedThreshold={0.1}
         ListFooterComponent={() =>
           loadingMore ? <ActivityIndicator size="large" color="#000" /> : null
         }
+        initialNumToRender={10} 
+        maxToRenderPerBatch={10} 
+        windowSize={5}
       />
     </SafeAreaView>
   );
