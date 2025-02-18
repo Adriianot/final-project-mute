@@ -117,7 +117,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             onPress={handleForgotPassword}
           >
             <Text style={styles.forgotPasswordText}>
-              ¿Forgot your password?
+              Forgot your password?
             </Text>
           </TouchableOpacity>
 

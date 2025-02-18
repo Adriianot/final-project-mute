@@ -35,10 +35,9 @@ export const registerForPushNotifications = async () => {
       if (!projectId) throw new Error("No se encontró el Project ID");
 
       token = (await Notifications.getExpoPushTokenAsync({ projectId })).data;
-      console.log("Expo Push Token:", token);
       return token;
     } catch (error) {
-      console.error("❌ Error obteniendo Expo Push Token:", error);
+
     }
   } else {
     Alert.alert("🚨 Debes usar un dispositivo físico para recibir notificaciones.");

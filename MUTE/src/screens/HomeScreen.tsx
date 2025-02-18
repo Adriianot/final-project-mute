@@ -6,9 +6,10 @@ import {
   ScrollView,
   TouchableOpacity,
   StatusBar,
-  Dimensions,
   SafeAreaView,
   TextInput,
+  FlatList,
+  ActivityIndicator,
 } from "react-native";
 import { StackNavigationProp } from "@react-navigation/stack";
 import Icon from "react-native-vector-icons/MaterialIcons";
@@ -16,6 +17,10 @@ import ViewPager from "react-native-pager-view";
 import { useTheme } from "../contexts/ThemeContext";
 import { useDebounce } from "../hooks/useDebounce";
 import { getDynamicStyles } from "../styles/homeStyles";
+import {
+  sendNotification,
+  registerForPushNotifications,
+} from "../utils/notifications";
 
 type RootStackParamList = {
   Home: undefined;
@@ -129,75 +134,144 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("Todos");
-
-  //  `useDebounce` 300ms
   const debouncedSearch = useDebounce(searchText, 300);
-
   const [currentIndex, setCurrentIndex] = useState(0);
   const viewPagerRef = useRef<ViewPager>(null);
+  const [page, setPage] = useState(1);
+  const perPage = 10; // Número de productos por página
+  const [hasMore, setHasMore] = useState(true);
 
-  useEffect(() => {
-    const fetchProducts = async () => {
+  const shuffleArray = (array: Product[]) => {
+    return array.sort(() => Math.random() - 0.5);
+  };
+
+  const fetchProducts = useCallback(
+    async (pageNum = 1, append = false) => {
+      if (!hasMore || loadingMore) return; 
+
       try {
+        if (pageNum === 1) setLoading(true);
+        else setLoadingMore(true);
+
         const response = await fetch(
-          "http://192.168.100.128:8000/auth/productos"
+          `http://192.168.100.128:8000/auth/productos?page=${pageNum}&perPage=${perPage}`
         );
         const data = await response.json();
+
+        if (!data || data.length === 0) {
+          setHasMore(false); 
+        }
+
+        if (data.length < perPage) {
+          setHasMore(false); 
+        }
+
+        const uniqueProducts = data.filter(
+          (newProduct: Product) =>
+            !products.some(
+              (existingProduct) => existingProduct.id === newProduct.id
+            )
+        ); 
+
+        if (uniqueProducts.length === 0) {
+          setHasMore(false); 
+          return;
+        }
+
         const productsWithTallas = data.map((product: Product) => ({
           ...product,
           tallas: Array.isArray(product.tallas) ? product.tallas : [],
         }));
-    
-        setProducts(productsWithTallas);
-        setFilteredProducts(productsWithTallas);
+
+        setProducts((prevProducts) =>
+          append ? [...prevProducts, ...productsWithTallas] : productsWithTallas
+        );
       } catch (error) {
         console.error("Error al obtener productos:", error);
+        setHasMore(false);
       } finally {
         setLoading(false);
+        setLoadingMore(false);
       }
-    };
+    },
+    [loadingMore, hasMore]
+  );
 
-    fetchProducts();
+  useEffect(() => {
+    setPage(1);
+    setProducts([]);
+    setHasMore(true);
+    fetchProducts(1, false);
+  }, [selectedCategory]);
+
+  useEffect(() => {
+    let filtered = products;
+
+    if (selectedCategory !== "Todos") {
+      filtered = products.filter(
+        (product) =>
+          product.categoria.toLowerCase() === selectedCategory.toLowerCase()
+      );
+    }
+
+    if (debouncedSearch !== "") {
+      filtered = filtered.filter(
+        (product) =>
+          product.nombre
+            .toLowerCase()
+            .includes(debouncedSearch.toLowerCase()) ||
+          product.descripcion
+            ?.toLowerCase()
+            .includes(debouncedSearch.toLowerCase()) ||
+          product.marca
+            ?.toLowerCase()
+            .includes(debouncedSearch.toLowerCase()) ||
+          product.genero?.toLowerCase().includes(debouncedSearch.toLowerCase())
+      );
+    }
+
+    setFilteredProducts(filtered);
+  }, [debouncedSearch, products, selectedCategory]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % BANNER_ITEMS.length);
+      viewPagerRef.current?.setPage((currentIndex + 1) % BANNER_ITEMS.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [currentIndex]);
+
+  useEffect(() => {
+    async function setupNotifications() {
+      const token = await registerForPushNotifications();
+      setTimeout(() => {
+        sendNotification(
+          "🏷️ Special Offers!",
+          "Take advantage of discounts in our store. MUTE"
+        );
+      }, 3000);
+    }
+
+    setupNotifications();
   }, []);
-useEffect(() => {
-  let filtered = products;
-
-  if (selectedCategory !== "Todos") {
-    filtered = products.filter(
-      (product) => product.categoria.toLowerCase() === selectedCategory.toLowerCase()
-    );
-  }
-
-  if (debouncedSearch !== "") {
-    filtered = filtered.filter(
-      (product) =>
-        product.nombre.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-        product.descripcion?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-        product.marca?.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-        product.genero?.toLowerCase().includes(debouncedSearch.toLowerCase())
-    );
-  }
-
-  setFilteredProducts(filtered);
-}, [debouncedSearch, products, selectedCategory]);
-
-useEffect(() => {
-  const interval = setInterval(() => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % BANNER_ITEMS.length);
-    viewPagerRef.current?.setPage((currentIndex + 1) % BANNER_ITEMS.length);
-  }, 3000);
-
-  return () => clearInterval(interval);
-}, [currentIndex]);
 
   const handleProductPress = (product: Product) => {
     console.log("Producto seleccionado antes de navegar:", product);
-    navigation.navigate("ProductDetail", { product }); 
+    navigation.navigate("ProductDetail", { product });
   };
-  
+
+  const loadMoreProducts = useCallback(() => {
+    if (!loadingMore && hasMore) {
+      const nextPage = page + 1;
+      setPage(nextPage);
+      fetchProducts(nextPage, true);
+    }
+  }, [loadingMore, hasMore, page]);
 
   return (
     <SafeAreaView style={dynamicStyles.container}>
@@ -205,97 +279,110 @@ useEffect(() => {
         backgroundColor={isDarkMode ? "#121212" : "#ffffff"}
         barStyle={isDarkMode ? "light-content" : "dark-content"}
       />
-      <Header
-        onMenuPress={() => navigation.navigate("Menu")}
-        onCartPress={() => navigation.navigate("CartScreen")}
-        isDarkMode={isDarkMode}
-        onSearch={setSearchText}
-        isSearching={isSearching}
-        toggleSearch={() => {
-          setIsSearching(!isSearching);
-          setSearchText("");
-        }}
-      />
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        style={dynamicStyles.scrollView}
-      >
-        {/* Banners with auto-slide */}
-        <ViewPager
-          ref={viewPagerRef}
-          style={dynamicStyles.viewPager}
-          initialPage={0}
-        >
-          {BANNER_ITEMS.map((item, index) => (
-            <View key={item.id} style={dynamicStyles.bannerPage}>
-              <Image
-                source={item.image}
-                style={dynamicStyles.bannerImage}
-                resizeMode="cover"
-              />
-            </View>
-          ))}
-        </ViewPager>
+      <FlatList
+        data={filteredProducts}
+        keyExtractor={(item, index) =>
+          item.id ? item.id.toString() : `product-${index}`
+        }
+        numColumns={2} // Mantiene el diseño de cuadrícula
+        columnWrapperStyle={{
+          justifyContent: "space-between",
+          paddingHorizontal: 10,
+        }} // Asegura buen espaciado
+        contentContainerStyle={{ paddingBottom: 20 }} // Da margen inferior
+        ListHeaderComponent={
+          // Aquí se coloca el contenido que se perdió
+          <>
+            <Header
+              onMenuPress={() => navigation.navigate("Menu")}
+              onCartPress={() => navigation.navigate("CartScreen")}
+              isDarkMode={isDarkMode}
+              onSearch={setSearchText}
+              isSearching={isSearching}
+              toggleSearch={() => {
+                setIsSearching(!isSearching);
+                setSearchText("");
+              }}
+            />
 
-        {/* Products*/}
-        <View style={dynamicStyles.featuredSection}>
-          <Text style={dynamicStyles.sectionTitle}>Products</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={dynamicStyles.categoryScroll}>
-      {CATEGORIES.map((category) => (
-        <TouchableOpacity
-          key={category}
-          style={[
-            dynamicStyles.categoryButton,
-            selectedCategory === category && dynamicStyles.categoryButtonSelected,
-          ]}
-          onPress={() => setSelectedCategory(category)}
-        >
-          <Text
-            style={[
-              dynamicStyles.categoryText,
-              selectedCategory === category && dynamicStyles.categoryTextSelected,
-            ]}
-          >
-            {category}
-          </Text>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
-          {loading ? (
-            <Text style={dynamicStyles.loadingText}>Cargando productos...</Text>
-          ) : (
-            <View style={dynamicStyles.productsGrid}>
-              {filteredProducts.length > 0 ? (
-                filteredProducts.map((product, index) => (
+            {/* Banners con auto-slide */}
+            <ViewPager
+              ref={viewPagerRef}
+              style={dynamicStyles.viewPager}
+              initialPage={0}
+            >
+              {BANNER_ITEMS.map((item) => (
+                <View key={item.id} style={dynamicStyles.bannerPage}>
+                  <Image
+                    source={item.image}
+                    style={dynamicStyles.bannerImage}
+                    resizeMode="cover"
+                  />
+                </View>
+              ))}
+            </ViewPager>
+
+            {/* Categorías */}
+            <View style={dynamicStyles.featuredSection}>
+              <Text style={dynamicStyles.sectionTitle}>Products</Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={dynamicStyles.categoryScroll}
+              >
+                {CATEGORIES.map((category) => (
                   <TouchableOpacity
-                    key={index}
-                    style={dynamicStyles.productCard}
-                    onPress={() => handleProductPress(product)}
+                    key={category}
+                    style={[
+                      dynamicStyles.categoryButton,
+                      selectedCategory === category &&
+                        dynamicStyles.categoryButtonSelected,
+                    ]}
+                    onPress={() => setSelectedCategory(category)}
                   >
-                    <Image
-                      source={{ uri: product.imagen }}
-                      style={dynamicStyles.productImage}
-                      resizeMode="cover"
-                    />
-                    <Text style={dynamicStyles.productTitle}>
-                      {product.nombre}
-                    </Text>
-                    <Text style={dynamicStyles.productPrice}>
-                      ${product.precio.toFixed(2)}
+                    <Text
+                      style={[
+                        dynamicStyles.categoryText,
+                        selectedCategory === category &&
+                          dynamicStyles.categoryTextSelected,
+                      ]}
+                    >
+                      {category}
                     </Text>
                   </TouchableOpacity>
-                ))
-              ) : (
-                <Text style={dynamicStyles.noResultsText}>
-                  No hay productos que coincidan con la búsqueda
-                </Text>
-              )}
+                ))}
+              </ScrollView>
             </View>
-          )}
-        </View>
-      </ScrollView>
+          </>
+        }
+        renderItem={({ item }) => (
+          <TouchableOpacity
+            style={[
+              dynamicStyles.productCard,
+              { flex: 1, margin: 5 }, // Espaciado uniforme
+            ]}
+            onPress={() => handleProductPress(item)}
+          >
+            <Image
+              source={{ uri: item.imagen }}
+              style={dynamicStyles.productImage}
+              resizeMode="cover"
+            />
+            <Text style={dynamicStyles.productTitle}>{item.nombre}</Text>
+            <Text style={dynamicStyles.productPrice}>
+              ${item.precio.toFixed(2)}
+            </Text>
+          </TouchableOpacity>
+        )}
+        onEndReached={hasMore ? loadMoreProducts : null} // Paginación funcional
+        onEndReachedThreshold={0.1}
+        ListFooterComponent={() =>
+          loadingMore ? <ActivityIndicator size="large" color="#000" /> : null
+        }
+      />
     </SafeAreaView>
   );
 };
 
 export default HomeScreen;
+//hasta aquo

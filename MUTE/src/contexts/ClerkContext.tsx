@@ -31,7 +31,6 @@ export const ClerkAuthProvider: React.FC<ClerkAuthProviderProps> = ({ children }
       if (createdSessionId) {
         await setActive!({ session: createdSessionId });
 
-        // ✅ Obtener el usuario desde Clerk
         const user = session?.user;
         if (!user) {
           return;
@@ -39,13 +38,12 @@ export const ClerkAuthProvider: React.FC<ClerkAuthProviderProps> = ({ children }
 
         console.log("✅ Usuario de Clerk obtenido:", user);
 
-        // 🔹 Guardar el token localmente
+
         const token = await session?.getToken();
         if (token) {
           await AsyncStorage.setItem("token", token);
         }
 
-        // 🔹 Sincronizar usuario con el backend
         await syncUserWithBackend(user);
       } else {
       }

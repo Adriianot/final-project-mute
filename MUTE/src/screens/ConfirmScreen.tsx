@@ -70,7 +70,6 @@ const ConfirmScreen: React.FC = () => {
   useEffect(() => {
     async function setupNotifications() {
       const token = await registerForPushNotifications();
-      console.log("Expo Push Token registrado:", token);
     }
 
     getCurrentLocation();
@@ -99,12 +98,10 @@ const ConfirmScreen: React.FC = () => {
       try {
         let email = null;
 
-        // 🔹 Intentar obtener el email de Clerk si el usuario está autenticado
         if (isLoaded && isSignedIn && clerkUser) {
           email = clerkUser.emailAddresses[0]?.emailAddress || null;
         }
 
-        // 🔹 Si no está en Clerk, buscar en AsyncStorage
         if (!email) {
           const storedEmail = await AsyncStorage.getItem("user_email");
           if (storedEmail) {
@@ -113,13 +110,10 @@ const ConfirmScreen: React.FC = () => {
         }
 
         if (!email) {
-          console.error("❌ No se pudo obtener el email del usuario.");
         } else {
-          console.log("✅ Email del usuario autenticado:", email);
           setUserEmail(email);
         }
       } catch (error) {
-        console.error("❌ Error obteniendo el email:", error);
       }
     };
 
