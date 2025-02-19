@@ -18,22 +18,22 @@ const ForgotPasswordScreen: React.FC = () => {
   const [newPassword, setNewPassword] = useState("");
   const [generatedCode, setGeneratedCode] = useState("");
 
-  // 🔹 Simula el envío de código de verificación
+  // 🔹 Simulates sending verification code
   const handleSendResetCode = () => {
     if (!email.includes("@")) {
       Alert.alert("Error", "Please enter a valid email.");
       return;
     }
 
-    // 🔥 Genera un código aleatorio de 6 dígitos
+    // 🔥 Generates a random 6-digit code
     const mockCode = Math.floor(100000 + Math.random() * 900000).toString();
     setGeneratedCode(mockCode);
 
-    Alert.alert("📧 Demo", `Code sent: ${mockCode}`); // Simula que se envió el código al email
+    Alert.alert("📧 Demo", `Code sent: ${mockCode}`); // Simulates that the code was sent to the email
     setModalVisible(true);
   };
 
-  // 🔹 Simula la verificación del código y el cambio de contraseña
+  // 🔹 Simulates code verification and password change
   const handleResetPassword = () => {
     if (code !== generatedCode) {
       Alert.alert("Error", "Invalid code. Try again.");
@@ -83,7 +83,7 @@ const ForgotPasswordScreen: React.FC = () => {
         <Text style={styles.resetButtonText}>Send Code</Text>
       </TouchableOpacity>
 
-      {/* 🔹 MODAL DE VERIFICACIÓN Y CAMBIO DE CONTRASEÑA */}
+      {/* 🔹 VERIFICATION MODE AND PASSWORD CHANGE*/}
       <Modal visible={modalVisible} animationType="slide" transparent>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   cancelButton: { marginTop: 10, backgroundColor: "#ccc", padding: 10, borderRadius: 8, alignItems: "center", width: "100%" },
   cancelButtonText: { color: "#333", fontSize: 16 },
 
-  // 🔹 Estilos del Modal
+  // 🔹 Modal Styles
   modalContainer: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "rgba(0,0,0,0.5)" },
   modalContent: { width: "90%", backgroundColor: "#fff", padding: 20, borderRadius: 8, alignItems: "center" },
   modalTitle: { fontSize: 18, fontWeight: "bold", marginBottom: 10 },
