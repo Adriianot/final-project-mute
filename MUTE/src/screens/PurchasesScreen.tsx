@@ -88,7 +88,7 @@ const PurchasesScreen: React.FC = () => {
           </View>
         ))
       ) : (
-        <Text style={dynamicStyles.itemPrice}>No hay productos en esta compra</Text>
+        <Text style={dynamicStyles.itemPrice}>There are no products in this purchase.</Text>
         
       )}
       <Text style={dynamicStyles.itemPrice}>Total: ${item.total.toFixed(2)}</Text>
@@ -106,7 +106,7 @@ const PurchasesScreen: React.FC = () => {
   return (
     <SafeAreaView style={dynamicStyles.container}>
       <View style={dynamicStyles.header}>
-        <Text style={dynamicStyles.headerTitle}>Mis Compras</Text>
+        <Text style={dynamicStyles.headerTitle}>My Purchases</Text>
       </View>
       {purchases.length > 0 ? (
         <FlatList
@@ -118,7 +118,7 @@ const PurchasesScreen: React.FC = () => {
           contentContainerStyle={dynamicStyles.cartList}
         />
       ) : (
-        <Text style={dynamicStyles.totalText}>No tienes compras registradas</Text>
+        <Text style={dynamicStyles.totalText}>You don't have registered purchases</Text>
       )}
     </SafeAreaView>
   );
