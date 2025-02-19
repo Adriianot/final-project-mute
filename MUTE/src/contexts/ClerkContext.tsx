@@ -1,7 +1,7 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import * as WebBrowser from 'expo-web-browser';
 import * as Linking from 'expo-linking';
-import { useOAuth, useClerk, useUser  } from '@clerk/clerk-expo'; // Importa useClerk para manejar sesiones
+import { useOAuth, useClerk, useUser  } from '@clerk/clerk-expo'; // Import useClerk to handle sessions
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface ClerkContextProps {
@@ -23,7 +23,7 @@ export const ClerkAuthProvider: React.FC<ClerkAuthProviderProps> = ({ children }
 
   const signInWithGoogle = async () => {
     try {
-      console.log("🔹 Iniciando Google Login...");
+      console.log("🔹 Starting Google Login...");
 
       const redirectUrl = Linking.createURL("/oauth-native");
       const { createdSessionId, setActive } = await startOAuthFlow({ redirectUrl });
@@ -36,7 +36,7 @@ export const ClerkAuthProvider: React.FC<ClerkAuthProviderProps> = ({ children }
           return;
         }
 
-        console.log("✅ Usuario de Clerk obtenido:", user);
+        console.log("✅ Clerk User Obtained:", user);
 
 
         const token = await session?.getToken();
@@ -48,7 +48,7 @@ export const ClerkAuthProvider: React.FC<ClerkAuthProviderProps> = ({ children }
       } else {
       }
     } catch (err) {
-      console.error("❌ Error al iniciar sesión con Google:", err);
+      console.error("❌ Error logging in with Google:", err);
     }
   };
 
@@ -65,9 +65,9 @@ export const ClerkAuthProvider: React.FC<ClerkAuthProviderProps> = ({ children }
       });
 
       const result = await response.json();
-      console.log("✅ Usuario sincronizado con el backend:", result);
+      console.log("✅ User synchronized with the backend:", result);
     } catch (error) {
-      console.error("❌ Error al sincronizar usuario con el backend:", error);
+      console.error("❌ Error synchronizing user with backend:", error);
     }
   };
 
