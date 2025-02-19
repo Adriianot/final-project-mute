@@ -90,7 +90,7 @@ const CartScreen: React.FC = () => {
           contentContainerStyle={dynamicStyles.cartList}
         />
       ) : (
-        <Text style={dynamicStyles.totalText}>Tu carrito está vacío</Text>
+        <Text style={dynamicStyles.totalText}>Your cart is empty</Text>
       )}
       <View style={dynamicStyles.footer}>
         <Text style={dynamicStyles.totalText}>
@@ -103,7 +103,7 @@ const CartScreen: React.FC = () => {
           }
           disabled={cartItems.length === 0}
         >
-          <Text style={dynamicStyles.confirmButtonText}>Confirmar Compra</Text>
+          <Text style={dynamicStyles.confirmButtonText}>Confirm Purchase</Text>
         </TouchableOpacity>
       </View>
     </View>
