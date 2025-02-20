@@ -172,7 +172,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
         else setLoadingMore(true);
 
         const response = await fetch(
-          `http://192.168.100.128:8000/auth/productos?page=${pageNum}&perPage=${perPage}`
+          `http://52.70.33.203:8000/auth/productos?page=${pageNum}&perPage=${perPage}`
         );
         const data = await response.json();
 

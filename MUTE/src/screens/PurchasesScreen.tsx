@@ -51,7 +51,7 @@ const PurchasesScreen: React.FC = () => {
     const fetchPurchases = async (email: string) => {
       try {
         const response = await axios.get(
-          `http://192.168.100.128:8000/auth/purchase?email=${email}`
+          `http://52.70.33.203:8000/auth/purchase?email=${email}`
         );
         setPurchases(response.data);
       } catch (error) {

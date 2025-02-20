@@ -23,7 +23,7 @@ export const ClerkAuthProvider: React.FC<ClerkAuthProviderProps> = ({ children }
 
   const signInWithGoogle = async () => {
     try {
-      console.log("🔹 Iniciando Google Login...");
+      
 
       const redirectUrl = Linking.createURL("/oauth-native");
       const { createdSessionId, setActive } = await startOAuthFlow({ redirectUrl });
@@ -38,7 +38,6 @@ export const ClerkAuthProvider: React.FC<ClerkAuthProviderProps> = ({ children }
 
         console.log("✅ Usuario de Clerk obtenido:", user);
 
-
         const token = await session?.getToken();
         if (token) {
           await AsyncStorage.setItem("token", token);
@@ -48,13 +47,12 @@ export const ClerkAuthProvider: React.FC<ClerkAuthProviderProps> = ({ children }
       } else {
       }
     } catch (err) {
-      console.error("❌ Error al iniciar sesión con Google:", err);
     }
   };
 
   const syncUserWithBackend = async (user: any) => {
     try {
-      const response = await fetch("http://192.168.100.128:8000/auth/clerk", {
+      const response = await fetch("http://52.70.33.203:8000/auth/clerk", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

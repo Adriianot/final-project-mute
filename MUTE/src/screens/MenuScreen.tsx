@@ -42,7 +42,7 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       if (!token) throw new Error("Token not found in storage");
 
       const response = await axios.get(
-        "http://192.168.100.128:8000/auth/user",
+        "http://52.70.33.203:8000/auth/user",
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -188,6 +188,7 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
       if (clerkSignOut) {
         await clerkSignOut();
       }
+      await new Promise(resolve => setTimeout(resolve, 1000));
       clearCart();
       navigation.navigate("Login");
     } catch (error) {}

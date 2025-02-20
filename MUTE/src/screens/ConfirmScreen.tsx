@@ -255,7 +255,7 @@ const ConfirmScreen: React.FC = () => {
     };
 
     try {
-      const response = await fetch("http://192.168.100.128:8000/auth/comprar", {
+      const response = await fetch("http://52.70.33.203:8000/auth/comprar", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
