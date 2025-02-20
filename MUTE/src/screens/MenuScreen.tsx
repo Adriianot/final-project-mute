@@ -93,7 +93,7 @@ const MenuScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
           setProfileImage(savedImage);
         }
       } catch (error) {
-        console.error("Error al cargar la imagen de perfil:", error);
+        console.error("Error loading profile image:", error);
       }
     };
 

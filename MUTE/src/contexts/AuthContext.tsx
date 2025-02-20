@@ -61,15 +61,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Logout function
   const signOut = async () => {
     try {
-      console.log("🔹 Cerrando sesión en AuthProvider...");
+      console.log("🔹 Logging out of AuthProvider...");
   
-      await AsyncStorage.removeItem("token"); // Eliminar token
+      await AsyncStorage.removeItem("token"); // Delete token
       await AsyncStorage.removeItem("user_email");
-      setIsAuthenticated(false); // Cambiar estado de autenticación
+      setIsAuthenticated(false); // Change authentication status
   
-      console.log("✅ Cierre de sesión en AuthProvider exitoso.");
+      console.log("✅ AuthProvider Logout Successful.");
     } catch (error) {
-      console.error("❌ Error al cerrar sesión en AuthProvider:", error);
+      console.error("❌ Error logging out of AuthProvider:", error);
     }
   };
 
@@ -87,5 +87,3 @@ export const useAuth = (): AuthContextProps => {
   }
   return context;
 };
-
-//hasta aquí 

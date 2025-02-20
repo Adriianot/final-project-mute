@@ -51,7 +51,7 @@ const ChatAssistantScreen: React.FC<ChatAssistantScreenProps> = ({
       const response = await axios.post(API_URL, { message: messageQ });
       return response.data.response;
     } catch (error: any) {
-      console.error("Error en el Chat:", error.response?.data || error.message);
+      console.error("Error in the Chat:", error.response?.data || error.message);
       return "⚠️ Sorry, there was an error connecting to the assistant.";
     }
   };

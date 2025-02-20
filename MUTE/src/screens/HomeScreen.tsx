@@ -207,7 +207,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
           append ? [...prevProducts, ...productsWithTallas] : productsWithTallas
         );
       } catch (error) {
-        console.error("Error al obtener productos:", error);
+        console.error("Error getting products:", error);
         setHasMore(false);
       } finally {
         setLoading(false);
@@ -277,7 +277,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
   }, []);
 
   const handleProductPress = (product: Product) => {
-    console.log("Producto seleccionado antes de navegar:", product);
+    console.log("Product selected before browsing:", product);
     navigation.navigate("ProductDetail", { product });
   };
 
@@ -326,7 +326,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               }}
             />
 
-            {/* Banners con auto-slide */}
+            {/* Banners with auto-slide */}
             <ViewPager
               ref={viewPagerRef}
               style={dynamicStyles.viewPager}
@@ -343,7 +343,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
               ))}
             </ViewPager>
 
-            {/* Categorías */}
+            {/* Categories */}
             <View style={dynamicStyles.featuredSection}>
               <Text style={dynamicStyles.sectionTitle}>Products</Text>
               <ScrollView
@@ -391,4 +391,4 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ navigation }) => {
 };
 
 export default HomeScreen;
-//hasta aquo
+

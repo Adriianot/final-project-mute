@@ -51,7 +51,7 @@ const ConfirmScreen: React.FC = () => {
   const [mapKey, setMapKey] = useState(0);
   const [userEmail, setUserEmail] = useState<string | null>(null);
 
-  // Campos del formulario
+  // Form fields
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -123,7 +123,7 @@ const ConfirmScreen: React.FC = () => {
   const getCurrentLocation = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
-      Alert.alert("Permiso denegado", "Activa la ubicación para continuar.");
+      Alert.alert("Permission denied", "Please activate location to continue.");
       return;
     }
     let loc = await Location.getCurrentPositionAsync({});
@@ -169,11 +169,11 @@ const ConfirmScreen: React.FC = () => {
       if (data.status === "OK") {
         return data.results[0].formatted_address;
       } else {
-        return "Dirección no encontrada";
+        return "Address not found";
       }
     } catch (error) {
       console.error(error);
-      return "Error al obtener la dirección";
+      return "Error getting address";
     }
   };
 
@@ -217,7 +217,7 @@ const ConfirmScreen: React.FC = () => {
 
   const handleConfirm = async () => {
     if (!userEmail) {
-      Alert.alert("Error", "No se pudo obtener el email del usuario.");
+      Alert.alert("Error", "Failed to get user email.");
       return;
     }
     
@@ -251,7 +251,7 @@ const ConfirmScreen: React.FC = () => {
       telefono: phone,
       direccion: address,
       ubicacion: location,
-      metodo_pago: "Tarjeta de Crédito",
+      metodo_pago: "Credit card",
     };
 
     try {
@@ -308,14 +308,14 @@ const ConfirmScreen: React.FC = () => {
 
         <TextInput
           style={dynamicStyles.input}
-          placeholder="Nombre Completo"
+          placeholder="Full Name"
           placeholderTextColor="#999"
           value={name}
           onChangeText={setName}
         />
         <TextInput
           style={dynamicStyles.input}
-          placeholder="Correo Electrónico"
+          placeholder="Email"
           placeholderTextColor="#999"
           keyboardType="email-address"
           value={userEmail|| ""}
@@ -327,7 +327,7 @@ const ConfirmScreen: React.FC = () => {
           textStyle={{ color: isDarkMode ? "#ffffff" : "#000000" }}
           initialCountry="us"
           textProps={{
-            placeholder: "Número de Teléfono",
+            placeholder: "Phone number",
             placeholderTextColor: isDarkMode ? "#ccc" : "#555",
           }}
           onChangePhoneNumber={(number) => setPhone(number)}
@@ -343,7 +343,7 @@ const ConfirmScreen: React.FC = () => {
               region={region || undefined}
               onPress={handleMapPress}
             >
-              <Marker coordinate={location} title="Ubicación Seleccionada" />
+              <Marker coordinate={location} title="Selected Location" />
             </MapView>
           </>
         ) : (
@@ -369,10 +369,10 @@ const ConfirmScreen: React.FC = () => {
           disabled={isProcessing}
         >
           <Text style={dynamicStyles.confirmButtonText}>
-            {isProcessing ? "Procesando..." : "CONFIRMAR"}
+            {isProcessing ? "Processing..." : "CONFIRM"}
           </Text>
         </TouchableOpacity>
-        {/* Modal de Procesamiento */}
+        {/*Processing Model*/}
         <Modal visible={isProcessing} transparent animationType="fade">
           <View style={dynamicStyles.modalContainer}>
             <Image
@@ -384,7 +384,7 @@ const ConfirmScreen: React.FC = () => {
           </View>
         </Modal>
 
-        {/* Modal de Pago Exitoso */}
+        {/* Successful Payment Method */}
         <Modal visible={isSuccessVisible} animationType="slide">
           <View style={dynamicStyles.fullScreenModal}>
             <Text style={dynamicStyles.paidText}>PAID SUCCESSFULLY</Text>

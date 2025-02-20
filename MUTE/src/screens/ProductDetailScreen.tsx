@@ -20,7 +20,7 @@ import { useCart } from "../contexts/CartContext";
 
 type ProductDetailProps = StackScreenProps<RootStackParamList, "ProductDetail">;
 
-const availableSizes = ["S", "M", "L", "XL"]; // Tallas predefinidas
+const availableSizes = ["S", "M", "L", "XL"]; // Predefined sizes
 
 const ProductDetailScreen: React.FC<ProductDetailProps> = ({
   route,
@@ -69,7 +69,7 @@ const ProductDetailScreen: React.FC<ProductDetailProps> = ({
         <Text style={dynamicStyles.description}>{product.descripcion}</Text>
         <Text style={dynamicStyles.price}>${product.precio.toFixed(2)}</Text>
 
-        {/* 📏 Selección de Tallas */}
+        {/* 📏 Size Selections */}
         <Text style={dynamicStyles.sectionTitle}>Select your size:</Text>
         <TouchableOpacity
           style={dynamicStyles.sizeSelector}
@@ -81,10 +81,10 @@ const ProductDetailScreen: React.FC<ProductDetailProps> = ({
           <Icon name="arrow-drop-down" size={24} color="#000" />
         </TouchableOpacity>
 
-        {/* 🚻 Género */}
+        {/* 🚻 Gender */}
         <Text style={dynamicStyles.sectionTitle}>Gender: {product.genero}</Text>
         
-        {/* 🔢 Contador de cantidad */}
+        {/* 🔢 Quantity counter*/}
         <View style={dynamicStyles.counterContainer}>
           <TouchableOpacity
             style={dynamicStyles.counterButton}
@@ -101,7 +101,7 @@ const ProductDetailScreen: React.FC<ProductDetailProps> = ({
           </TouchableOpacity>
         </View>
 
-        {/* Ajustar el botón de agregar al carrito para incluir la cantidad */}
+        {/* Adjust the add to cart button to include the quantity */}
         <TouchableOpacity
           style={[
             dynamicStyles.addButton,
@@ -115,7 +115,7 @@ const ProductDetailScreen: React.FC<ProductDetailProps> = ({
         </TouchableOpacity>
       </View>
 
-      {/* MODAL PARA SELECCIONAR TALLA */}
+      {/* MODAL TO SELECT SIZE */}
       <Modal
         transparent={true}
         visible={modalVisible}
